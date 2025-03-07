@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
+import java.util.stream.Collectors;
 
 public class ArrayListProductDao implements ProductDao {
     private List<Product> products;
@@ -40,7 +41,8 @@ public class ArrayListProductDao implements ProductDao {
         return products.stream()
                 .filter(this::NotNullPriceProducts)
                 .filter(this::NotOutOfStockProducts)
-                .toList();}
+                .collect(Collectors.toList());
+        }
         finally {
             lock.readLock().unlock();
         }
