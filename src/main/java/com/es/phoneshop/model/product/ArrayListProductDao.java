@@ -1,10 +1,7 @@
 package com.es.phoneshop.model.product;
 
 import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.Currency;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 import java.util.stream.Collectors;
@@ -19,6 +16,7 @@ public class ArrayListProductDao implements ProductDao {
         products = new ArrayList<>();
         saveSampleProducts();
     }
+
     @Override
     public Product getProduct(Long id) {
         lock.readLock().lock();
@@ -37,23 +35,21 @@ public class ArrayListProductDao implements ProductDao {
     @Override
     public List<Product> findProducts() {
         lock.readLock().lock();
-        try{
-        return products.stream()
-                .filter(this::NotNullPriceProducts)
-                .filter(this::NotOutOfStockProducts)
-                .collect(Collectors.toList());
-        }
-        finally {
+        try {
+            return products.stream()
+                    .filter(this::NotNullPriceProducts)
+                    .filter(this::NotOutOfStockProducts)
+                    .collect(Collectors.toList());
+        } finally {
             lock.readLock().unlock();
         }
     }
 
-    private boolean NotNullPriceProducts(Product product)
-    {
+    private boolean NotNullPriceProducts(Product product) {
         return product.getPrice() != null;
     }
-    private boolean NotOutOfStockProducts(Product product)
-    {
+
+    private boolean NotOutOfStockProducts(Product product) {
         return product.getStock() > 0;
     }
 
@@ -76,21 +72,25 @@ public class ArrayListProductDao implements ProductDao {
                         product.setId(maxId++);
                         products.add(product);
                     });
-        }finally {
+        } finally {
             lock.writeLock().unlock();
         }
     }
 
     @Override
-    public void delete(Long id) throws NullPointerException {
+    public void delete(Long id) throws NoSuchElementException {
         lock.writeLock().lock();
         try {
-            products.removeIf(product -> id.equals(product.getId()));
+            boolean removed = products.removeIf(product -> id.equals(product.getId()));
+            if (!removed) {
+                throw new NoSuchElementException("Продукт с ID " + id + " не найден.");
+            }
+        } finally {
+            lock.writeLock().unlock();
         }
-        finally {lock.writeLock().unlock();}
     }
 
-    private void saveSampleProducts(){
+    private void saveSampleProducts() {
         Currency usd = Currency.getInstance("USD");
         save(new Product("sgs", "Samsung Galaxy S", new BigDecimal(100), usd, 100, "https://raw.githubusercontent.com/andrewosipenko/phoneshop-ext-images/master/manufacturer/Samsung/Samsung%20Galaxy%20S.jpg"));
         save(new Product("sgs2", "Samsung Galaxy S II", new BigDecimal(200), usd, 5, "https://raw.githubusercontent.com/andrewosipenko/phoneshop-ext-images/master/manufacturer/Samsung/Samsung%20Galaxy%20S%20II.jpg"));
