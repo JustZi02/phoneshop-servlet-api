@@ -59,12 +59,8 @@ public class ArrayListProductDaoTest {
         assertNull(productDao.getProduct(3L));
     }
 
-    @Test
+    @Test(expected = NoSuchElementException.class)
     public void testDeleteProductIncorrectId() throws NoSuchElementException {
-        try {
-            productDao.delete(15L);
-        } catch (NoSuchElementException e) {
-            assertTrue(true);
-        }
+        productDao.delete(15L);
     }
 }
