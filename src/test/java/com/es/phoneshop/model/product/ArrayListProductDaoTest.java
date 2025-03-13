@@ -14,7 +14,7 @@ public class ArrayListProductDaoTest {
 
     @Before
     public void setup() {
-        productDao = new ArrayListProductDao();
+        productDao = ArrayListProductDao.getInstance();
     }
 
     @Test
@@ -32,7 +32,7 @@ public class ArrayListProductDaoTest {
 
     @Test
     public void testFindProductsNoResults() {
-        assertNotNull(productDao.findProducts());
+        assertNotNull(productDao.findProducts(null, null, null));
     }
 
     @Test
