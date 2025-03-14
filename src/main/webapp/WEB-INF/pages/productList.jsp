@@ -5,42 +5,45 @@
 
 <jsp:useBean id="products" type="java.util.ArrayList" scope="request"/>
 <tags:master pageTitle="Product List">
-  <p>
-    Welcome to Expert-Soft training!
-  </p>
-  <form>
-    <label>
-      <input name = "query" value="${param.query}">
-    </label>
-    <button>Search</button>
-  </form>
-  <table>
-    <thead>
-      <tr>
-        <td>Image</td>
-        <td>
-          Description
-          <tags:sortLink field="description" order="desc"/>
-          <tags:sortLink field="description" order="asc"/>
-        </td>
+    <p>
+        Welcome to Expert-Soft training!
+    </p>
+    <form>
+        <label>
+            <input name="query" value="${param.query}">
+        </label>
+        <button>Search</button>
+    </form>
+    <table>
+        <thead>
+        <tr>
+            <td>Image</td>
+            <td>
+                Description
+                <tags:sortLink field="description" order="desc"/>
+                <tags:sortLink field="description" order="asc"/>
+            </td>
 
-        <td class="price">
-          Price
-          <tags:sortLink field="price" order="desc"/>
-          <tags:sortLink field="price" order="asc"/>
-        </td>
-      </tr>
-    </thead>
-    <c:forEach var="product" items="${products}">
-      <tr>
-        <td>
-          <img class="product-tile" src="${product.imageUrl}">
-        </td>
-        <td>${product.description}</td>
-        <td class="price">
-          <fmt:formatNumber value="${product.price}" type="currency" currencySymbol="${product.currency.symbol}"/>
-        </td>
-      </tr>
-    </c:forEach>
-  </table>
+            <td class="price">
+                Price
+                <tags:sortLink field="price" order="desc"/>
+                <tags:sortLink field="price" order="asc"/>
+            </td>
+        </tr>
+        </thead>
+        <c:forEach var="product" items="${products}">
+            <tr>
+                <td>
+                    <img class="product-tile" src="${product.imageUrl}">
+                </td>
+                <td>
+                    <a href="${pageContext.servletContext.contextPath}/products/${product.id}">${product.description}</a>
+                </td>
+                <td class="price">
+                    <fmt:formatNumber value="${product.price}" type="currency"
+                                      currencySymbol="${product.currency.symbol}"/>
+                </td>
+            </tr>
+        </c:forEach>
+    </table>
 </tags:master>

@@ -17,14 +17,16 @@ public class DemoDataServletContextListener implements ServletContextListener {
     }
 
     @Override
-    public void contextInitialized(ServletContextEvent sce) {
-        ServletContextListener.super.contextInitialized(sce);
-        saveSampleProducts();
+    public void contextInitialized(ServletContextEvent event) {
+        ServletContextListener.super.contextInitialized(event);
+        if (Boolean.valueOf(event.getServletContext().getInitParameter("insertDemoData"))) {
+            saveSampleProducts();
+        }
     }
 
     @Override
     public void contextDestroyed(ServletContextEvent sce) {
-        // ServletContextListener.super.contextDestroyed(sce);
+        ServletContextListener.super.contextDestroyed(sce);
     }
 
     private void saveSampleProducts() {
