@@ -27,7 +27,6 @@ public class ProductListPageServlet extends HttpServlet {
         String query = request.getParameter("query");
         String sortField = request.getParameter("field");
         String sortOrder = request.getParameter("order");
-        SortField sortField1 = SortField.description;
         request.setAttribute("products",
                 productDao.findProducts(
                         query,
