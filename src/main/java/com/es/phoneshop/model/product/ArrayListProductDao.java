@@ -111,9 +111,11 @@ public class ArrayListProductDao implements ProductDao {
         lock.writeLock().lock();
         try {
             Objects.requireNonNull(product, "Product cannot be null");
-            products.stream().filter(p -> p.getId().equals(product.getId())).findFirst().ifPresentOrElse(p -> {
-                p.setCode(product.getCode());
+            products.stream().filter(p -> p.getCode().equals(product.getCode())).findFirst().ifPresentOrElse(p -> {
                 p.setDescription(product.getDescription());
+                if (!p.getPrice().equals(product.getPrice())) {
+                    p.setPriceHistory(product.getPriceHistory().get(product.getPriceHistory().size() - 1));
+                }
                 p.setPrice(product.getPrice());
                 p.setCurrency(product.getCurrency());
                 p.setStock(product.getStock());

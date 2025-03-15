@@ -23,7 +23,6 @@
                 <tags:sortLink field="description" order="desc"/>
                 <tags:sortLink field="description" order="asc"/>
             </td>
-
             <td class="price">
                 Price
                 <tags:sortLink field="price" order="desc"/>
@@ -34,16 +33,32 @@
         <c:forEach var="product" items="${products}">
             <tr>
                 <td>
-                    <img class="product-tile" src="${product.imageUrl}">
+                    <img class="product-tile" src="${product.imageUrl}" alt="">
                 </td>
                 <td>
                     <a href="${pageContext.servletContext.contextPath}/products/${product.id}">${product.description}</a>
                 </td>
-                <td class="price">
+                <td class="tooltip">
                     <fmt:formatNumber value="${product.price}" type="currency"
                                       currencySymbol="${product.currency.symbol}"/>
+                    <span class="tooltiptext">
+                        <strong>${product.description}</strong>
+                        <br/>
+                            <hr>
+                                <strong>
+                                    Start Date | Price
+                                </strong>
+                        <br/>
+                        <c:forEach var="priceHistory" items="${product.priceHistory}">
+                             <c:out value="${priceHistory.date}"/> |
+                                <fmt:formatNumber value="${priceHistory.price}" type="currency"
+                              currencySymbol="${product.currency.symbol}"/>
+                         <br/>
+                        </c:forEach>
+                    </span>
                 </td>
             </tr>
         </c:forEach>
     </table>
 </tags:master>
+
