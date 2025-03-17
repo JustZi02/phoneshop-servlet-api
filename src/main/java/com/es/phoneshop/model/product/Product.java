@@ -50,8 +50,8 @@ public class Product {
         this.imageUrl = imageUrl;
     }
 
-    public void setPriceHistory(PriceHistory priceHistory) {
-        this.priceHistory.add(priceHistory);
+    public void setPriceHistory(List<PriceHistory> priceHistory) {
+        this.priceHistory = priceHistory;
     }
 
     public List<PriceHistory> getPriceHistory() {

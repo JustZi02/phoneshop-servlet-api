@@ -13,16 +13,16 @@ public class ArrayListProductDao implements ProductDao {
     private List<Product> products;
     private long maxId;
 
+    private ArrayListProductDao() {
+        products = new ArrayList<Product>();
+        maxId = 0l;
+    }
+
     public static synchronized ProductDao getInstance() {
         if (instance == null) {
             instance = new ArrayListProductDao();
         }
         return instance;
-    }
-
-    private ArrayListProductDao() {
-        products = new ArrayList<Product>();
-        maxId = 0l;
     }
 
     @Override
@@ -42,13 +42,14 @@ public class ArrayListProductDao implements ProductDao {
 
     @Override
     public List<Product> findProducts(String query, SortField sortField, SortOrder sortOrder) {
+
         lock.readLock().lock();
         try {
             return products.stream()
                     .filter(product -> MatchQueryProducts(product, query))
                     .filter(this::NotNullPriceProducts)
                     .filter(this::NotOutOfStockProducts)
-                    .sorted(Comparator.comparingInt((Product product) -> calculateRelevance(product.getDescription(), query))
+                    .sorted(Comparator.comparingDouble((Product product) -> calculateRelevance(product.getDescription(), query))
                             .reversed()
                             .thenComparing((p1, p2) -> sortByFieldAndOrder(p1, p2, sortField, sortOrder)))
                     .collect(Collectors.toList());
@@ -75,33 +76,30 @@ public class ArrayListProductDao implements ProductDao {
         };
     }
 
-    private int calculateRelevance(String description, String query) {
+    private double calculateRelevance(String description, String query) {
         if (query == null || description == null) {
-            return 0;
+            return 0.0;
         }
-
         String descLower = description.toLowerCase();
         String queryLower = query.toLowerCase();
-
-        if (descLower.equals(queryLower)) {
-            return 20;
-        }
-        if (descLower.contains(queryLower)) {
-            return 10;
-        }
 
         String[] queryWords = queryLower.split("\\s+");
         String[] descWords = descLower.split("\\s+");
 
-        long exactWordMatches = Arrays.stream(queryWords).filter(word -> Arrays.asList(descWords).contains(word)).count();
+        long exactWordMatches = Arrays.stream(queryWords)
+                .filter(word -> Arrays.asList(descWords).contains(word))
+                .count();
 
-        return (int) exactWordMatches;
+        double relevance = (double) exactWordMatches / queryWords.length;
+        return relevance;
     }
+
 
     private boolean MatchQueryProducts(Product product, String query) {
         if (query == null) {
             return true;
         }
+        query = query.trim();
         String[] queryParts = query.toLowerCase().split("\\s+");
         return Arrays.stream(queryParts).anyMatch(product.getDescription().toLowerCase()::contains);
     }
@@ -121,9 +119,7 @@ public class ArrayListProductDao implements ProductDao {
             Objects.requireNonNull(product, "Product cannot be null");
             products.stream().filter(p -> p.getCode().equals(product.getCode())).findFirst().ifPresentOrElse(p -> {
                 p.setDescription(product.getDescription());
-                if (p.getPrice().compareTo(product.getPrice()) != 0) {
-                    p.setPriceHistory(product.getPriceHistory().get(product.getPriceHistory().size() - 1));
-                }
+                updatePriceHistory(p, product);
                 p.setPrice(product.getPrice());
                 p.setCurrency(product.getCurrency());
                 p.setStock(product.getStock());
@@ -135,6 +131,21 @@ public class ArrayListProductDao implements ProductDao {
         } finally {
             lock.writeLock().unlock();
         }
+    }
+
+    private void updatePriceHistory(Product p, Product product) {
+        List<PriceHistory> priceHistoryList = new ArrayList<>(p.getPriceHistory());
+
+        for (PriceHistory newHistory : product.getPriceHistory()) {
+            boolean exists = priceHistoryList.stream()
+                    .anyMatch(history -> history.getPrice().equals(newHistory.getPrice())
+                            && history.getDate().equals(newHistory.getDate()));
+            if (!exists) {
+                priceHistoryList.add(newHistory);
+            }
+        }
+        priceHistoryList.sort(Comparator.comparing(PriceHistory::getDate));
+        p.setPriceHistory(priceHistoryList);
     }
 
     @Override
