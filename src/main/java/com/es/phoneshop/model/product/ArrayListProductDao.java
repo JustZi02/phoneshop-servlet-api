@@ -34,7 +34,7 @@ public class ArrayListProductDao implements ProductDao {
                     .filter(this::NotNullPriceProducts)
                     .filter(this::NotOutOfStockProducts)
                     .findAny()
-                    .orElseThrow(() -> new NoSuchElementException("Product with id " + id + " not found"));
+                    .orElseThrow(() -> new NoSuchElementException("Product with id " + id + " was not found."));
         } finally {
             lock.readLock().unlock();
         }
@@ -76,13 +76,19 @@ public class ArrayListProductDao implements ProductDao {
     }
 
     private int calculateRelevance(String description, String query) {
-        if (query == null || description == null) return 0;
+        if (query == null || description == null) {
+            return 0;
+        }
 
         String descLower = description.toLowerCase();
         String queryLower = query.toLowerCase();
 
-        if (descLower.equals(queryLower)) return Integer.MAX_VALUE;
-        if (descLower.contains(queryLower)) return 10000;
+        if (descLower.equals(queryLower)) {
+            return 20;
+        }
+        if (descLower.contains(queryLower)) {
+            return 10;
+        }
 
         String[] queryWords = queryLower.split("\\s+");
         String[] descWords = descLower.split("\\s+");
@@ -93,7 +99,9 @@ public class ArrayListProductDao implements ProductDao {
     }
 
     private boolean MatchQueryProducts(Product product, String query) {
-        if (query == null) return true;
+        if (query == null) {
+            return true;
+        }
         String[] queryParts = query.toLowerCase().split("\\s+");
         return Arrays.stream(queryParts).anyMatch(product.getDescription().toLowerCase()::contains);
     }
@@ -113,7 +121,7 @@ public class ArrayListProductDao implements ProductDao {
             Objects.requireNonNull(product, "Product cannot be null");
             products.stream().filter(p -> p.getCode().equals(product.getCode())).findFirst().ifPresentOrElse(p -> {
                 p.setDescription(product.getDescription());
-                if (!p.getPrice().equals(product.getPrice())) {
+                if (p.getPrice().compareTo(product.getPrice()) != 0) {
                     p.setPriceHistory(product.getPriceHistory().get(product.getPriceHistory().size() - 1));
                 }
                 p.setPrice(product.getPrice());

@@ -8,6 +8,6 @@
         Sorry, this product not exist.
     </h1>
     <p>
-        Product was not found.
+            ${errorMessage}
     </p>
 </tags:master>

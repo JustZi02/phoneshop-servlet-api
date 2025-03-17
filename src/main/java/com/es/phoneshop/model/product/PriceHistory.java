@@ -3,7 +3,7 @@ package com.es.phoneshop.model.product;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 
-public class PriceHistory {
+public class PriceHistory implements Comparable<PriceHistory> {
     LocalDate date;
     BigDecimal price;
 
@@ -29,5 +29,10 @@ public class PriceHistory {
 
     public void setDate(LocalDate date) {
         this.date = date;
+    }
+
+    @Override
+    public int compareTo(PriceHistory o) {
+        return this.price.compareTo(o.getPrice());
     }
 }

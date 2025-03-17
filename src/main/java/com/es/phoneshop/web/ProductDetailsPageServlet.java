@@ -9,6 +9,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
 import java.io.IOException;
+import java.util.NoSuchElementException;
 
 public class ProductDetailsPageServlet extends HttpServlet {
     ProductDao productDao;
@@ -21,8 +22,13 @@ public class ProductDetailsPageServlet extends HttpServlet {
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        request.setAttribute("product", productDao.getProduct(Long.parseLong(request
-                .getPathInfo().substring(1))));
+        try {
+            request.setAttribute("product", productDao.getProduct(Long.parseLong(request
+                    .getPathInfo().substring(1))));
+        } catch (NoSuchElementException e) {
+            request.setAttribute("errorMessage", e.getMessage());
+            request.getRequestDispatcher("/WEB-INF/pages/errorNoSuchElementException.jsp").forward(request, response);
+        }
         request.getRequestDispatcher("/WEB-INF/pages/productDetails.jsp").forward(request, response);
     }
 }
