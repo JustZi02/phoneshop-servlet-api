@@ -49,7 +49,8 @@ public class ArrayListProductDao implements ProductDao {
                     .filter(product -> MatchQueryProducts(product, query))
                     .filter(this::NotNullPriceProducts)
                     .filter(this::NotOutOfStockProducts)
-                    .sorted(Comparator.comparingDouble((Product product) -> calculateRelevance(product.getDescription(), query))
+                    .sorted(Comparator.comparingLong((Product product) -> calculateWordMatch(product.getDescription(), query))
+                            .thenComparingDouble((Product product) -> calculateRelevance(product.getDescription(), query))
                             .reversed()
                             .thenComparing((p1, p2) -> sortByFieldAndOrder(p1, p2, sortField, sortOrder)))
                     .collect(Collectors.toList());
@@ -74,6 +75,22 @@ public class ArrayListProductDao implements ProductDao {
                 yield sortOrder == SortOrder.desc ? -result : result;
             }
         };
+    }
+
+    private long calculateWordMatch(String description, String query) {
+        if (query == null || description == null) {
+            return 0;
+        }
+        String descLower = description.toLowerCase();
+        String queryLower = query.toLowerCase();
+
+        String[] queryWords = queryLower.split("\\s+");
+        String[] descWords = descLower.split("\\s+");
+
+        long exactWordMatches = Arrays.stream(queryWords)
+                .filter(word -> Arrays.asList(descWords).contains(word))
+                .count();
+        return exactWordMatches;
     }
 
     private double calculateRelevance(String description, String query) {
@@ -138,8 +155,8 @@ public class ArrayListProductDao implements ProductDao {
 
         for (PriceHistory newHistory : product.getPriceHistory()) {
             boolean exists = priceHistoryList.stream()
-                    .anyMatch(history -> history.getPrice().equals(newHistory.getPrice())
-                            && history.getDate().equals(newHistory.getDate()));
+                    .anyMatch(history -> history.getPrice().compareTo(newHistory.getPrice()) == 0
+                            && history.getDate().compareTo(newHistory.getDate()) == 0);
             if (!exists) {
                 priceHistoryList.add(newHistory);
             }
