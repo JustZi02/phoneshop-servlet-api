@@ -1,5 +1,7 @@
 package com.es.phoneshop.model.product;
 
+import com.es.phoneshop.model.sorting.SortField;
+import com.es.phoneshop.model.sorting.SortOrder;
 import org.junit.Before;
 import org.junit.Test;
 

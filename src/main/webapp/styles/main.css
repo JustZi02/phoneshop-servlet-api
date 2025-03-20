@@ -13,6 +13,10 @@ header img {
     max-width: 64px;
 }
 
+footer {
+    background-color: aquamarine;
+}
+
 table {
     border-collapse: collapse;
     border: 1px solid gray;
@@ -25,6 +29,10 @@ td {
 }
 
 .price {
+    text-align: right;
+}
+
+.quantity {
     text-align: right;
 }
 
@@ -59,7 +67,5 @@ body.product-list {
 
     .tooltip:hover .tooltiptext {
         visibility: visible;
-        opacity: 1;
     }
 }
-
