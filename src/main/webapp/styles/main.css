@@ -33,11 +33,73 @@ td {
 }
 
 .quantity {
-    text-align: right;
+
 }
 
 img.product-tile {
     max-width: 64px;
+}
+
+
+.product-details {
+    width: 300px;
+    border: 2px solid gray;
+    border-collapse: collapse;
+}
+
+.product-details td {
+    border: 1px solid gray;
+    padding: 8px;
+    word-wrap: break-word;
+    white-space: normal;
+}
+
+img.product-history {
+    max-width: 100px;
+}
+
+table.product-history {
+    border: 2px solid gray;
+    border-collapse: separate;
+    border-spacing: 0;
+    text-align: center;
+    display: inline-block;
+    margin: 5px;
+    width: 150px;
+    height: 200px;
+    overflow: hidden;
+    word-wrap: break-word;
+}
+
+table.product-history td {
+    border: none;
+    padding: 5px;
+    vertical-align: middle;
+    max-width: 100%;
+    white-space: normal;
+    text-align: center;
+}
+
+table.product-history img {
+    max-width: 100%;
+    height: auto;
+    display: block;
+    margin: 0 auto;
+}
+
+.word-wrap {
+    white-space: normal; /* Разрешаем перенос строк */
+}
+
+.error {
+    color: red;
+    white-space: normal;
+    word-wrap: break-word; /* Перенос длинных слов */
+    overflow-wrap: break-word; /* Альтернативный вариант */
+}
+
+.success {
+    color: green;
 }
 
 /* Page specific styles */

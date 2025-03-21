@@ -50,15 +50,16 @@
                                 </strong>
                         <br/>
                         <c:forEach var="priceHistory" items="${product.priceHistory}">
-                             <c:out value="${priceHistory.date}"/> |
-                                <fmt:formatNumber value="${priceHistory.price}" type="currency"
-                              currencySymbol="${product.currency.symbol}"/>
-                         <br/>
+                            <c:out value="${priceHistory.date}"/> |
+                            <fmt:formatNumber value="${priceHistory.price}" type="currency"
+                                              currencySymbol="${product.currency.symbol}"/>
+                            <br/>
                         </c:forEach>
                     </span>
                 </td>
             </tr>
         </c:forEach>
     </table>
+    <tags:searchHistory/>
 </tags:master>
 
