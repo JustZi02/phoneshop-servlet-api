@@ -185,7 +185,8 @@ public class ArrayListProductDao implements ProductDao {
     public void updateQuantity(Long id, int quantity) {
         lock.writeLock().lock();
         try {
-            getProduct(id).setStock(getProduct(id).getStock() - quantity);
+            Product product = getProduct(id);
+            product.setStock(product.getStock() - quantity);
         } finally {
             lock.writeLock().unlock();
         }

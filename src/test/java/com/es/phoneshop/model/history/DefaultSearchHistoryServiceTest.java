@@ -24,7 +24,7 @@ public class DefaultSearchHistoryServiceTest {
 
     @Before
     public void setUp() {
-        searchHistoryService = new DefaultSearchHistoryService();
+        searchHistoryService = DefaultSearchHistoryService.getInstance();
         request = mock(HttpServletRequest.class);
         session = mock(HttpSession.class);
         when(request.getSession()).thenReturn(session);
@@ -39,7 +39,7 @@ public class DefaultSearchHistoryServiceTest {
 
         when(session.getAttribute("recentProducts")).thenReturn(products);
 
-        searchHistoryService.Update(product, request);
+        searchHistoryService.update(product, request);
 
         verify(session).setAttribute("recentProducts", products);
         assertEquals(1, products.size());
@@ -56,8 +56,8 @@ public class DefaultSearchHistoryServiceTest {
 
         when(session.getAttribute("recentProducts")).thenReturn(products);
 
-        searchHistoryService.Update(product1, request);
-        searchHistoryService.Update(product2, request);
+        searchHistoryService.update(product1, request);
+        searchHistoryService.update(product2, request);
 
         verify(session, times(2)).setAttribute("recentProducts", products);
 
@@ -77,10 +77,10 @@ public class DefaultSearchHistoryServiceTest {
         List<Product> products = new LinkedList<>();
         when(session.getAttribute("recentProducts")).thenReturn(products);
 
-        searchHistoryService.Update(product1, request);
-        searchHistoryService.Update(product2, request);
-        searchHistoryService.Update(product3, request);
-        searchHistoryService.Update(product4, request);
+        searchHistoryService.update(product1, request);
+        searchHistoryService.update(product2, request);
+        searchHistoryService.update(product3, request);
+        searchHistoryService.update(product4, request);
 
         verify(session, times(4)).setAttribute("recentProducts", products);
         assertEquals(3, products.size());

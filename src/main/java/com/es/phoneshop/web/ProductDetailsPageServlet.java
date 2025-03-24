@@ -5,6 +5,7 @@ import com.es.phoneshop.model.cart.CartService;
 import com.es.phoneshop.model.cart.DefaultCartService;
 import com.es.phoneshop.model.exceptions.OutOfStockException;
 import com.es.phoneshop.model.history.DefaultSearchHistoryService;
+import com.es.phoneshop.model.history.SearchHistoryService;
 import com.es.phoneshop.model.product.ArrayListProductDao;
 import com.es.phoneshop.model.product.Product;
 import com.es.phoneshop.model.product.ProductDao;
@@ -23,21 +24,21 @@ import java.util.NoSuchElementException;
 public class ProductDetailsPageServlet extends HttpServlet {
     private ProductDao productDao;
     private CartService cartService;
-    private DefaultSearchHistoryService searchHistoryService;
+    private SearchHistoryService searchHistoryService;
 
     @Override
     public void init(ServletConfig config) throws ServletException {
         super.init(config);
         productDao = ArrayListProductDao.getInstance();
         cartService = DefaultCartService.getInstance();
-        searchHistoryService = new DefaultSearchHistoryService();
+        searchHistoryService = DefaultSearchHistoryService.getInstance();
     }
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         HttpSession session = request.getSession();
         Product product = productDao.getProduct(parseProductId(request));
-        searchHistoryService.Update(product, request);
+        searchHistoryService.update(product, request);
         try {
             request.setAttribute("product", productDao.getProduct(parseProductId(request)));
             request.setAttribute("cart", cartService.getCart(request).toString());
@@ -51,11 +52,18 @@ public class ProductDetailsPageServlet extends HttpServlet {
 
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        String stringQuantity = request.getParameter("quantity");
+        String stringQuantity = request.getParameter("quantity").trim();
         Long productId = parseProductId(request);
         int quantity;
+        stringQuantity = stringQuantity.trim();
         try {
+            if (!stringQuantity.matches("[\\d\\s,.]+")) {
+                throw new ParseException("Invalid number format", 0);
+            }
             NumberFormat formatter = NumberFormat.getInstance(request.getLocale());
+            if (formatter.parse(stringQuantity).doubleValue() % 1 != 0) {
+                throw new ParseException("Invalid number format", 0);
+            }
             quantity = formatter.parse(stringQuantity).intValue();
         } catch (ParseException e) {
             request.setAttribute("errorMessage", "This field is for numbers only.");
@@ -76,10 +84,10 @@ public class ProductDetailsPageServlet extends HttpServlet {
             doGet(request, response);
             return;
         }
+
         HttpSession session = request.getSession();
         session.setAttribute("message", "Product added successfully!");
         response.sendRedirect(request.getContextPath() + "/products/" + productId);
-
     }
 
     private long parseProductId(HttpServletRequest request) throws NumberFormatException {
