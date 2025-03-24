@@ -4,6 +4,7 @@ import com.es.phoneshop.model.cart.Cart;
 import com.es.phoneshop.model.cart.CartService;
 import com.es.phoneshop.model.cart.DefaultCartService;
 import com.es.phoneshop.model.exceptions.OutOfStockException;
+import com.es.phoneshop.model.history.DefaultSearchHistoryService;
 import com.es.phoneshop.model.product.ArrayListProductDao;
 import com.es.phoneshop.model.product.Product;
 import com.es.phoneshop.model.product.ProductDao;
@@ -16,26 +17,27 @@ import jakarta.servlet.http.HttpSession;
 
 import java.io.IOException;
 import java.text.NumberFormat;
-import java.util.LinkedList;
-import java.util.List;
+import java.text.ParseException;
 import java.util.NoSuchElementException;
 
 public class ProductDetailsPageServlet extends HttpServlet {
     private ProductDao productDao;
     private CartService cartService;
+    private DefaultSearchHistoryService searchHistoryService;
 
     @Override
     public void init(ServletConfig config) throws ServletException {
         super.init(config);
         productDao = ArrayListProductDao.getInstance();
         cartService = DefaultCartService.getInstance();
+        searchHistoryService = new DefaultSearchHistoryService();
     }
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         HttpSession session = request.getSession();
-        UpdateSearchHistory(session, request);
-        request.setAttribute("product", productDao.getProduct(parseProductId(request)));
+        Product product = productDao.getProduct(parseProductId(request));
+        searchHistoryService.Update(product, request);
         try {
             request.setAttribute("product", productDao.getProduct(parseProductId(request)));
             request.setAttribute("cart", cartService.getCart(request).toString());
@@ -54,8 +56,8 @@ public class ProductDetailsPageServlet extends HttpServlet {
         int quantity;
         try {
             NumberFormat formatter = NumberFormat.getInstance(request.getLocale());
-            quantity = Integer.parseInt(stringQuantity);
-        } catch (NumberFormatException e) {
+            quantity = formatter.parse(stringQuantity).intValue();
+        } catch (ParseException e) {
             request.setAttribute("errorMessage", "This field is for numbers only.");
             doGet(request, response);
             return;
@@ -84,18 +86,4 @@ public class ProductDetailsPageServlet extends HttpServlet {
         return Long.parseLong(request.getPathInfo().substring(1));
     }
 
-    private void UpdateSearchHistory(HttpSession session, HttpServletRequest request) {
-        List<Product> recentProducts = (List<Product>) session.getAttribute("recentProducts");
-        if (recentProducts == null) {
-            recentProducts = new LinkedList<>();
-        }
-        recentProducts.removeIf(p -> p.getId() == parseProductId(request));
-
-        recentProducts.add(0, productDao.getProduct(parseProductId(request)));
-
-        if (recentProducts.size() > 3) {
-            recentProducts.remove(3);
-        }
-        session.setAttribute("recentProducts", recentProducts);
-    }
 }

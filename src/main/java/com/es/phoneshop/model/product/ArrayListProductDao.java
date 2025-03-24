@@ -180,4 +180,14 @@ public class ArrayListProductDao implements ProductDao {
             lock.writeLock().unlock();
         }
     }
+
+    @Override
+    public void updateQuantity(Long id, int quantity) {
+        lock.writeLock().lock();
+        try {
+            getProduct(id).setStock(getProduct(id).getStock() - quantity);
+        } finally {
+            lock.writeLock().unlock();
+        }
+    }
 }
