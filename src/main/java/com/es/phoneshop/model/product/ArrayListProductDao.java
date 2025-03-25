@@ -1,6 +1,9 @@
 package com.es.phoneshop.model.product;
 
 
+import com.es.phoneshop.model.sorting.SortField;
+import com.es.phoneshop.model.sorting.SortOrder;
+
 import java.util.*;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
@@ -173,6 +176,17 @@ public class ArrayListProductDao implements ProductDao {
             if (!removed) {
                 throw new NoSuchElementException("Продукт с ID " + id + " не найден.");
             }
+        } finally {
+            lock.writeLock().unlock();
+        }
+    }
+
+    @Override
+    public void updateQuantity(Long id, int quantity) {
+        lock.writeLock().lock();
+        try {
+            Product product = getProduct(id);
+            product.setStock(product.getStock() - quantity);
         } finally {
             lock.writeLock().unlock();
         }
