@@ -53,12 +53,36 @@ public class DefaultCartService implements CartService {
                         .findFirst()
                         .ifPresentOrElse(item -> item.setQuantity(item.getQuantity() + quantity),
                                 () -> cart.getItems().add(new CartItem(product, quantity)));
-                productDao.updateQuantity(productId, quantity);
+                // productDao.updateQuantity(productId, quantity);
             } else {
                 throw new OutOfStockException("We don't have so many items of this product", quantity, product.getStock());
             }
         } finally {
             lock.writeLock().unlock();
         }
+    }
+
+    @Override
+    public void update(Cart cart, long productId, int quantity) {
+        lock.writeLock().lock();
+        try {
+            Product product = productDao.getProduct(productId);
+            if (product.getStock() >= quantity) {
+                cart.getItems().stream()
+                        .filter(item -> item.getProduct().getId() == productId)
+                        .findFirst()
+                        .ifPresent(item -> item.setQuantity(quantity));
+            } else {
+                throw new OutOfStockException("We don't have so many items of this product", quantity, product.getStock());
+            }
+        } finally {
+            lock.writeLock().unlock();
+        }
+    }
+
+    @Override
+    public void delete(Cart cart, long productId) {
+        cart.getItems().removeIf(item ->
+                item.getProduct().getId().equals(productId));
     }
 }

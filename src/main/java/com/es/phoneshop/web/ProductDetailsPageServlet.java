@@ -37,15 +37,15 @@ public class ProductDetailsPageServlet extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         HttpSession session = request.getSession();
-        Product product = productDao.getProduct(parseProductId(request));
-        searchHistoryService.update(product, request);
         try {
-            request.setAttribute("product", productDao.getProduct(parseProductId(request)));
-            request.setAttribute("cart", cartService.getCart(request).toString());
+            Product product = productDao.getProduct(parseProductId(request));
+            searchHistoryService.update(product, request);
+            request.setAttribute("product", product);
         } catch (NoSuchElementException e) {
             request.setAttribute("errorMessage", e.getMessage());
             request.getRequestDispatcher("/WEB-INF/pages/errorNoSuchElementException.jsp").forward(request, response);
         }
+        request.setAttribute("cart", cartService.getCart(request).toString());
         request.getRequestDispatcher("/WEB-INF/pages/productDetails.jsp").forward(request, response);
         session.setAttribute("message", "");
     }
@@ -93,5 +93,4 @@ public class ProductDetailsPageServlet extends HttpServlet {
     private long parseProductId(HttpServletRequest request) throws NumberFormatException {
         return Long.parseLong(request.getPathInfo().substring(1));
     }
-
 }

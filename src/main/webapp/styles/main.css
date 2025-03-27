@@ -33,7 +33,7 @@ td {
 }
 
 .quantity {
-
+    text-align: right;
 }
 
 img.product-tile {
