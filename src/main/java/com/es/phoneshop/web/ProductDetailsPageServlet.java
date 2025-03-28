@@ -9,6 +9,8 @@ import com.es.phoneshop.model.history.SearchHistoryService;
 import com.es.phoneshop.model.product.ArrayListProductDao;
 import com.es.phoneshop.model.product.Product;
 import com.es.phoneshop.model.product.ProductDao;
+import com.es.phoneshop.model.validation.Validation;
+import jakarta.servlet.RequestDispatcher;
 import jakarta.servlet.ServletConfig;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServlet;
@@ -17,7 +19,6 @@ import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 
 import java.io.IOException;
-import java.text.NumberFormat;
 import java.text.ParseException;
 import java.util.NoSuchElementException;
 
@@ -54,27 +55,17 @@ public class ProductDetailsPageServlet extends HttpServlet {
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         String stringQuantity = request.getParameter("quantity").trim();
         Long productId = parseProductId(request);
+        Validation validation = new Validation();
         int quantity;
-        stringQuantity = stringQuantity.trim();
         try {
-            if (!stringQuantity.matches("[\\d\\s,.]+")) {
-                throw new ParseException("Invalid number format", 0);
-            }
-            NumberFormat formatter = NumberFormat.getInstance(request.getLocale());
-            if (formatter.parse(stringQuantity).doubleValue() % 1 != 0) {
-                throw new ParseException("Invalid number format", 0);
-            }
-            quantity = formatter.parse(stringQuantity).intValue();
+            quantity = validation.QuantityStringToInt(stringQuantity, request.getLocale());
         } catch (ParseException e) {
-            request.setAttribute("errorMessage", "This field is for numbers only.");
+            request.setAttribute("errorMessage", "Invalid number format.");
+            RequestDispatcher dispatcher = request.getRequestDispatcher(request.getRequestURI());
             doGet(request, response);
             return;
         }
-        if (quantity < 1) {
-            request.setAttribute("errorMessage", "Quantity must be a positive number.");
-            doGet(request, response);
-            return;
-        }
+
         Cart cart = cartService.getCart(request);
         try {
             cartService.add(cart, productId, quantity);
@@ -93,4 +84,5 @@ public class ProductDetailsPageServlet extends HttpServlet {
     private long parseProductId(HttpServletRequest request) throws NumberFormatException {
         return Long.parseLong(request.getPathInfo().substring(1));
     }
+
 }

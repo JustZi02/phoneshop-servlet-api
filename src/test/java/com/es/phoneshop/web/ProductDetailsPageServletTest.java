@@ -20,7 +20,6 @@ import org.mockito.junit.MockitoJUnitRunner;
 import java.math.BigDecimal;
 import java.util.Currency;
 import java.util.Locale;
-import java.util.NoSuchElementException;
 
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.*;
@@ -65,12 +64,12 @@ public class ProductDetailsPageServletTest {
         when(request.getRequestDispatcher(anyString())).thenReturn(requestDispatcher);
     }
 
-    @Test(expected = NoSuchElementException.class)
+    @Test()
     public void testDoGet() throws Exception {
         when(request.getPathInfo()).thenReturn("/1");
         servlet.doGet(request, response);
         verify(requestDispatcher).forward(request, response);
-        verify(request).setAttribute(eq("product"), 1l);
+        verify(request).setAttribute(eq("product"), eq(productDao.getProduct(1L)));
     }
 
     @Test
@@ -92,6 +91,6 @@ public class ProductDetailsPageServletTest {
 
         servlet.doPost(request, response);
 
-        verify(request).setAttribute("errorMessage", "This field is for numbers only.");
+        verify(request).setAttribute("errorMessage", "Invalid number format.");
     }
 }

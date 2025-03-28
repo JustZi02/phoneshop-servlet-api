@@ -54,4 +54,10 @@ public class DefaultCartServiceTest {
         cartService.add(cart, 0l, 1);
         assertThat(cart, notNullValue());
     }
+
+    @Test
+    public void DeleteItem() {
+        cartService.delete(cart, 0l);
+        assertThat(cart.getItems().size(), CoreMatchers.is(0));
+    }
 }

@@ -45,7 +45,7 @@
                         <img class="product-tile" src="${cartItem.product.imageUrl}" alt="">
                     </td>
                     <td>
-                            ${cartItem.product.description}
+                        <a href="${pageContext.servletContext.contextPath}/products/${cartItem.product.id}">${cartItem.product.description}</a>
                     </td>
                     <td class="price">
                         <fmt:formatNumber value="${cartItem.product.price}" type="currency"
@@ -74,6 +74,17 @@
                     </td>
                 </tr>
             </c:forEach>
+            <tr>
+                <td></td>
+                <td></td>
+                <td>
+                    Total cost: ${cart.totalPrice}$
+                </td>
+                <td>
+                    Total quantity: ${cart.totalQuantity} items
+                </td>
+                <td></td>
+            </tr>
         </table>
         <p>
             <button>Confirm</button>
