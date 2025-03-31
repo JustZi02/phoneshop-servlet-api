@@ -91,6 +91,7 @@ public class ProductDetailsPageServletTest {
 
         servlet.doPost(request, response);
 
-        verify(request).setAttribute("errorMessage", "Invalid number format.");
+        verify(session).setAttribute("errorMessage", "Invalid number format.");
+        verify(response).sendRedirect(request.getContextPath() + "/products/1");
     }
 }

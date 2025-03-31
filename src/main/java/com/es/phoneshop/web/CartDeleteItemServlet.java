@@ -15,7 +15,6 @@ public class CartDeleteItemServlet extends HttpServlet {
 
     private CartService cartService;
 
-
     @Override
     public void init(ServletConfig config) throws ServletException {
         super.init(config);
