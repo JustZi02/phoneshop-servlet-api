@@ -79,6 +79,4 @@ public class CartPageServlet extends HttpServlet {
             response.sendRedirect(request.getContextPath() + "/cart");
         }
     }
-
-
 }
