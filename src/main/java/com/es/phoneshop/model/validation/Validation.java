@@ -5,7 +5,7 @@ import java.text.ParseException;
 import java.util.Locale;
 
 public class Validation {
-    public int QuantityStringToInt(String stringQuantity, Locale locale) throws ParseException {
+    public static int quantityStringToInt(String stringQuantity, Locale locale) throws ParseException {
         stringQuantity = stringQuantity.trim();
         if (!stringQuantity.matches("[\\d\\s,.]+")) {
             throw new ParseException("Invalid number format", 0);

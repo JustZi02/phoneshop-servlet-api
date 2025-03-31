@@ -46,9 +46,11 @@ public class ProductDetailsPageServlet extends HttpServlet {
             request.setAttribute("errorMessage", e.getMessage());
             request.getRequestDispatcher("/WEB-INF/pages/errorNoSuchElementException.jsp").forward(request, response);
         }
-        request.setAttribute("cart", cartService.getCart(request).toString());
+        request.setAttribute("cart", cartService.getCart(request.getSession()).toString());
         request.getRequestDispatcher("/WEB-INF/pages/productDetails.jsp").forward(request, response);
         session.setAttribute("message", "");
+        session.setAttribute("errorMessage", "");
+        session.setAttribute("quantity", "");
     }
 
     @Override
@@ -58,21 +60,22 @@ public class ProductDetailsPageServlet extends HttpServlet {
         Validation validation = new Validation();
         int quantity;
         try {
-            quantity = validation.QuantityStringToInt(stringQuantity, request.getLocale());
+            quantity = validation.quantityStringToInt(stringQuantity, request.getLocale());
         } catch (ParseException e) {
-            request.setAttribute("errorMessage", "Invalid number format.");
-            RequestDispatcher dispatcher = request.getRequestDispatcher(request.getRequestURI());
-            doGet(request, response);
+            request.getSession().setAttribute("errorMessage", "Invalid number format.");
+            request.getSession().setAttribute("quantity", stringQuantity);
+            response.sendRedirect(request.getContextPath() + "/products/" + productId);
             return;
         }
 
-        Cart cart = cartService.getCart(request);
+        Cart cart = cartService.getCart(request.getSession());
         try {
             cartService.add(cart, productId, quantity);
         } catch (OutOfStockException e) {
-            request.setAttribute("errorMessage", "Sorry, we don't have enough product stock! " +
+            request.getSession().setAttribute("errorMessage", "Sorry, we don't have enough product stock! " +
                     "Asked quantity: " + e.getRequestedQuantity() + ", available quantity: " + e.getAvailableQuantity());
-            doGet(request, response);
+            request.getSession().setAttribute("quantity", stringQuantity);
+            response.sendRedirect(request.getContextPath() + "/products/" + productId);
             return;
         }
 

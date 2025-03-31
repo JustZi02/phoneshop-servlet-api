@@ -76,7 +76,7 @@ public class ProductDetailsPageServletTest {
     public void testDoPost() throws Exception {
         when(request.getPathInfo()).thenReturn("/1");
         when(request.getParameter("quantity")).thenReturn("2");
-        when(cartService.getCart(request)).thenReturn(cart);
+        when(cartService.getCart(request.getSession())).thenReturn(cart);
 
         servlet.doPost(request, response);
 

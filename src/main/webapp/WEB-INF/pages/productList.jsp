@@ -19,7 +19,7 @@
                 ${sessionScope.message}
         </div>
     </c:if>
-    <c:if test="${not empty errorMessage}">
+    <c:if test="${not empty sessionScope.errorMessage}">
         <div class="error">
             It was problem adding to cart.
         </div>
@@ -59,8 +59,8 @@
                     <td>
                         <label>
                             <input name="quantity"
-                                   value="${not empty errorMessage && errorItem eq product.id ? param.quantity : 1}">
-                            <c:if test="${not empty errorMessage && errorItem eq product.id}">
+                                   value="${not empty sessionScope.errorMessage && sessionScope.errorItem eq product.id ? sessionScope.quantity : 1}">
+                            <c:if test="${not empty sessionScope.errorMessage && sessionScope.errorItem eq product.id}">
                                 <div class="error">
                                         ${errorMessage}
                                 </div>

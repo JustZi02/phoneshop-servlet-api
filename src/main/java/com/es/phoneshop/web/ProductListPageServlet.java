@@ -45,35 +45,39 @@ public class ProductListPageServlet extends HttpServlet {
         request.getRequestDispatcher("/WEB-INF/pages/productList.jsp").forward(request, response);
         HttpSession session = request.getSession();
         session.setAttribute("message", "");
+        session.setAttribute("errorMessage", "");
+        session.setAttribute("errorItem", "");
+        session.setAttribute("quantity", null);
     }
 
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         String stringQuantity = request.getParameter("quantity").trim();
         Long productId = Long.parseLong(request.getParameter("productId"));
-        Validation validation = new Validation();
         String errorMessage = "";
 
         int quantity;
         try {
-            quantity = validation.QuantityStringToInt(stringQuantity, request.getLocale());
+            quantity = Validation.quantityStringToInt(stringQuantity, request.getLocale());
         } catch (ParseException e) {
             errorMessage = "Invalid number format.";
-            request.setAttribute("errorMessage", errorMessage);
-            request.setAttribute("errorItem", productId);
-            doGet(request, response);
+            request.getSession().setAttribute("errorMessage", errorMessage);
+            request.getSession().setAttribute("errorItem", productId);
+            request.getSession().setAttribute("quantity", stringQuantity);
+            response.sendRedirect(request.getContextPath() + "/products");
             return;
         }
 
-        Cart cart = cartService.getCart(request);
+        Cart cart = cartService.getCart(request.getSession());
         try {
             cartService.add(cart, productId, quantity);
         } catch (OutOfStockException e) {
             errorMessage = "Sorry, we don't have enough product stock! " +
                     "Asked quantity: " + e.getRequestedQuantity() + ", available quantity: " + e.getAvailableQuantity();
-            request.setAttribute("errorMessage", errorMessage);
-            request.setAttribute("errorItem", productId);
-            doGet(request, response);
+            request.getSession().setAttribute("errorMessage", errorMessage);
+            request.getSession().setAttribute("errorItem", productId);
+            request.getSession().setAttribute("quantity", stringQuantity);
+            response.sendRedirect(request.getContextPath() + "/products");
             return;
         }
 

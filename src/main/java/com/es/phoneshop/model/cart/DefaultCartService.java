@@ -4,7 +4,7 @@ import com.es.phoneshop.model.exceptions.OutOfStockException;
 import com.es.phoneshop.model.product.ArrayListProductDao;
 import com.es.phoneshop.model.product.Product;
 import com.es.phoneshop.model.product.ProductDao;
-import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpSession;
 
 import java.math.BigDecimal;
 import java.util.concurrent.locks.ReadWriteLock;
@@ -29,12 +29,12 @@ public class DefaultCartService implements CartService {
     }
 
     @Override
-    public Cart getCart(HttpServletRequest request) {
+    public Cart getCart(HttpSession session) {
         lock.readLock().lock();
         try {
-            Cart cart = (Cart) request.getSession().getAttribute(CART_SESSION_ATTRIBUTE);
+            Cart cart = (Cart) session.getAttribute(CART_SESSION_ATTRIBUTE);
             if (cart == null) {
-                request.getSession().setAttribute(CART_SESSION_ATTRIBUTE, cart = new Cart());
+                session.setAttribute(CART_SESSION_ATTRIBUTE, cart = new Cart());
             }
             return cart;
         } finally {
