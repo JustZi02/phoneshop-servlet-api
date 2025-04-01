@@ -1,9 +1,13 @@
 package com.es.phoneshop.model.product;
 
+import java.io.Serial;
+import java.io.Serializable;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 
-public class PriceHistory implements Comparable<PriceHistory> {
+public class PriceHistory implements Comparable<PriceHistory>, Serializable {
+    @Serial
+    private static final long serialVersionUID = -9105213053970010819L;
     LocalDate date;
     BigDecimal price;
 

@@ -12,14 +12,12 @@ import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 
-import java.io.IOException;
-
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @RunWith(MockitoJUnitRunner.class)
-public class ProductListPageServletTest {
+public class MiniCartServletTest {
     @Mock
     private HttpServletRequest request;
     @Mock
@@ -29,9 +27,9 @@ public class ProductListPageServletTest {
     @Mock
     private ServletConfig config;
     @Mock
-    HttpSession session;
+    private HttpSession session;
 
-    private ProductListPageServlet servlet = new ProductListPageServlet();
+    private MiniCartServlet servlet = new MiniCartServlet();
 
     @Before
     public void setup() throws ServletException {
@@ -41,10 +39,10 @@ public class ProductListPageServletTest {
     }
 
     @Test
-    public void testDoGet() throws ServletException, IOException {
+    public void testDoGet() throws Exception {
         servlet.doGet(request, response);
 
-        verify(requestDispatcher).forward(request, response);
-        verify(request).setAttribute(eq("products"), any());
+        verify(requestDispatcher).include(request, response);
+        verify(request).setAttribute(eq("cart"), any());
     }
 }
