@@ -1,5 +1,6 @@
 package com.es.phoneshop.web;
 
+import com.es.phoneshop.model.constants.StoreConstants;
 import com.es.phoneshop.model.cart.Cart;
 import com.es.phoneshop.model.cart.CartService;
 import com.es.phoneshop.model.cart.DefaultCartService;
@@ -10,7 +11,6 @@ import com.es.phoneshop.model.product.ArrayListProductDao;
 import com.es.phoneshop.model.product.Product;
 import com.es.phoneshop.model.product.ProductDao;
 import com.es.phoneshop.model.validation.Validation;
-import jakarta.servlet.RequestDispatcher;
 import jakarta.servlet.ServletConfig;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServlet;
@@ -43,44 +43,42 @@ public class ProductDetailsPageServlet extends HttpServlet {
             searchHistoryService.update(product, request);
             request.setAttribute("product", product);
         } catch (NoSuchElementException e) {
-            request.setAttribute("errorMessage", e.getMessage());
-            request.getRequestDispatcher("/WEB-INF/pages/errorNoSuchElementException.jsp").forward(request, response);
+            request.setAttribute(StoreConstants.Parameters.ERROR_MESSAGE, e.getMessage());
+            request.getRequestDispatcher(StoreConstants.Pages.ERROR_NO_SUCH_ELEMENT_EXCEPTION).forward(request, response);
         }
-        request.setAttribute("cart", cartService.getCart(request.getSession()).toString());
-        request.getRequestDispatcher("/WEB-INF/pages/productDetails.jsp").forward(request, response);
+        request.setAttribute("cart", cartService.getCart(session).toString());
+        request.getRequestDispatcher(StoreConstants.Pages.PRODUCT_DETAILS).forward(request, response);
         session.setAttribute("message", "");
-        session.setAttribute("errorMessage", "");
-        session.setAttribute("quantity", "");
     }
 
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         String stringQuantity = request.getParameter("quantity").trim();
         Long productId = parseProductId(request);
-        Validation validation = new Validation();
         int quantity;
         try {
-            quantity = validation.quantityStringToInt(stringQuantity, request.getLocale());
+            quantity = Validation.quantityStringToInt(stringQuantity, request.getLocale());
         } catch (ParseException e) {
-            request.getSession().setAttribute("errorMessage", "Invalid number format.");
-            request.getSession().setAttribute("quantity", stringQuantity);
-            response.sendRedirect(request.getContextPath() + "/products/" + productId);
-            return;
-        }
-
-        Cart cart = cartService.getCart(request.getSession());
-        try {
-            cartService.add(cart, productId, quantity);
-        } catch (OutOfStockException e) {
-            request.getSession().setAttribute("errorMessage", "Sorry, we don't have enough product stock! " +
-                    "Asked quantity: " + e.getRequestedQuantity() + ", available quantity: " + e.getAvailableQuantity());
-            request.getSession().setAttribute("quantity", stringQuantity);
-            response.sendRedirect(request.getContextPath() + "/products/" + productId);
+            request.setAttribute(StoreConstants.Parameters.ERROR_MESSAGE,
+                    StoreConstants.Messages.INVALID_NUMBER_FORMAT_MESSAGE);
+            doGet(request, response);
             return;
         }
 
         HttpSession session = request.getSession();
-        session.setAttribute("message", "Product added successfully!");
+        Cart cart = cartService.getCart(session);
+        try {
+            cartService.add(cart, productId, quantity);
+        } catch (OutOfStockException e) {
+            request.setAttribute(StoreConstants.Parameters.ERROR_MESSAGE,
+                    String.format(StoreConstants.Messages.OUT_OF_STOCK_MESSAGE,
+                            e.getRequestedQuantity(), e.getAvailableQuantity()));
+            doGet(request, response);
+            return;
+        }
+
+        session.setAttribute(StoreConstants.Parameters.SUCCESS_MESSAGE,
+                String.format(StoreConstants.Messages.PRODUCT_ADDED_TO_CART_MESSAGE));
         response.sendRedirect(request.getContextPath() + "/products/" + productId);
     }
 

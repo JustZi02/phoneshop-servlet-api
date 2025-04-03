@@ -1,8 +1,9 @@
 package com.es.phoneshop.web;
 
-import com.es.phoneshop.model.cart.CartService;
-import com.es.phoneshop.model.cart.DefaultCartService;
 import com.es.phoneshop.model.constants.StoreConstants;
+import com.es.phoneshop.model.order.ArrayListOrderDao;
+import com.es.phoneshop.model.order.Order;
+import com.es.phoneshop.model.order.OrderDao;
 import jakarta.servlet.ServletConfig;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServlet;
@@ -11,26 +12,19 @@ import jakarta.servlet.http.HttpServletResponse;
 
 import java.io.IOException;
 
-public class MiniCartServlet extends HttpServlet {
-
-    private CartService cartService;
-
+public class OrderOverviewPageServlet extends HttpServlet {
+    private OrderDao orderDao;
 
     @Override
     public void init(ServletConfig config) throws ServletException {
         super.init(config);
-        cartService = DefaultCartService.getInstance();
-    }
-
-    @Override
-    protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        doGet(req, resp);
+        orderDao = ArrayListOrderDao.getInstance();
     }
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        request.setAttribute("cart", cartService.getCart(request.getSession()));
-        request.getRequestDispatcher(StoreConstants.Pages.MINI_CART).include(request, response);
+        Order order = orderDao.getOrderSecureId(request.getPathInfo().substring(1));
+        request.setAttribute("order", order);
+        request.getRequestDispatcher(StoreConstants.Pages.ORDER_OVERVIEW).forward(request, response);
     }
-
 }

@@ -12,7 +12,7 @@
                 ${sessionScope.message}
         </div>
     </c:if>
-    <c:if test="${not empty sessionScope.errorMessage}">
+    <c:if test="${not empty errorMessage}">
         <div class="error">
             There was an error adding to cart.
         </div>
@@ -47,11 +47,11 @@
                 <td>
                     <label>
                         <input name="quantity"
-                               value="${not empty sessionScope.errorMessage ? sessionScope.quantity : 1}">
+                               value="${not empty errorMessage ? param.quantity : 1}">
                     </label>
-                    <c:if test="${not empty sessionScope.errorMessage}">
+                    <c:if test="${not empty errorMessage}">
                         <div class="error">
-                                ${sessionScope.errorMessage}
+                                ${errorMessage}
                         </div>
                     </c:if>
                 </td>
