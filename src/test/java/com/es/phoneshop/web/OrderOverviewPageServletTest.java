@@ -12,12 +12,14 @@ import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 
+import java.util.NoSuchElementException;
+
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @RunWith(MockitoJUnitRunner.class)
-public class MiniCartServletTest {
+public class OrderOverviewPageServletTest {
     @Mock
     private HttpServletRequest request;
     @Mock
@@ -29,7 +31,7 @@ public class MiniCartServletTest {
     @Mock
     private HttpSession session;
 
-    private MiniCartServlet servlet = new MiniCartServlet();
+    private OrderOverviewPageServlet servlet = new OrderOverviewPageServlet();
 
     @Before
     public void setup() throws ServletException {
@@ -38,10 +40,11 @@ public class MiniCartServletTest {
         when(request.getSession()).thenReturn(session);
     }
 
-    @Test
+    @Test(expected = NoSuchElementException.class)
     public void testDoGet() throws Exception {
+        when(request.getPathInfo()).thenReturn("/1");
         servlet.doGet(request, response);
-        verify(requestDispatcher).include(request, response);
-        verify(request).setAttribute(eq("cart"), any());
+        verify(requestDispatcher).forward(request, response);
+        verify(request).setAttribute(eq("order"), anyObject());
     }
 }

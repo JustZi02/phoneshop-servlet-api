@@ -17,7 +17,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @RunWith(MockitoJUnitRunner.class)
-public class MiniCartServletTest {
+public class CheckoutPageServletTest {
     @Mock
     private HttpServletRequest request;
     @Mock
@@ -29,7 +29,7 @@ public class MiniCartServletTest {
     @Mock
     private HttpSession session;
 
-    private MiniCartServlet servlet = new MiniCartServlet();
+    private CheckoutPageServlet servlet = new CheckoutPageServlet();
 
     @Before
     public void setup() throws ServletException {
@@ -41,7 +41,13 @@ public class MiniCartServletTest {
     @Test
     public void testDoGet() throws Exception {
         servlet.doGet(request, response);
-        verify(requestDispatcher).include(request, response);
-        verify(request).setAttribute(eq("cart"), any());
+        verify(requestDispatcher).forward(request, response);
+    }
+
+    @Test
+    public void testDoPost() throws Exception {
+        servlet.doPost(request, response);
+        verify(request).setAttribute(eq("errors"), anyObject());
+        verify(request).setAttribute(eq("paymentMethods"), anyObject());
     }
 }

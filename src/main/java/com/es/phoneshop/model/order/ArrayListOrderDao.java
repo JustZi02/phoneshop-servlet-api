@@ -1,9 +1,10 @@
 package com.es.phoneshop.model.order;
 
 
+import com.es.phoneshop.model.exceptions.OrderNotFoundException;
+
 import java.util.ArrayList;
 import java.util.List;
-import java.util.NoSuchElementException;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
@@ -33,7 +34,7 @@ public class ArrayListOrderDao implements OrderDao {
             return orders.stream()
                     .filter(order -> id.equals(order.getId()))
                     .findAny()
-                    .orElseThrow(() -> new NoSuchElementException("Order with id " + id + " was not found."));
+                    .orElseThrow(() -> new OrderNotFoundException("Order with id " + id + " was not found."));
         } finally {
             lock.readLock().unlock();
         }
@@ -57,13 +58,13 @@ public class ArrayListOrderDao implements OrderDao {
     }
 
     @Override
-    public Order getOrderSecureId(String secureId) {
+    public Order getOrderSecureId(String secureId) throws OrderNotFoundException {
         lock.readLock().lock();
         try {
             return orders.stream()
                     .filter(order -> secureId.equals(order.getSecureId()))
                     .findAny()
-                    .orElseThrow(() -> new NoSuchElementException("Order with id " + secureId + " was not found."));
+                    .orElseThrow(() -> new OrderNotFoundException("Order with id " + secureId + " was not found."));
         } finally {
             lock.readLock().unlock();
         }

@@ -23,6 +23,7 @@ public class StoreConstants {
         public final static String MINI_CART = "/WEB-INF/pages/miniCart.jsp";
         public final static String CHECKOUT = "/WEB-INF/pages/checkout.jsp";
         public final static String ERROR_NO_SUCH_ELEMENT_EXCEPTION = "/WEB-INF/pages/errorNoSuchElementException.jsp";
+        public final static String ERROR_ORDER_NOT_FOUND = "/WEB-INF/pages/errorOrderNotFoundException.jsp";
         public final static String ORDER_OVERVIEW = "/WEB-INF/pages/orderOverview.jsp";
     }
 }
