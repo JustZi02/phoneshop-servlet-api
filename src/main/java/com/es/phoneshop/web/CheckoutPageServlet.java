@@ -16,6 +16,7 @@ import jakarta.servlet.http.HttpSession;
 
 import java.io.IOException;
 import java.sql.Date;
+import java.time.LocalDate;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Consumer;
@@ -26,10 +27,13 @@ public class CheckoutPageServlet extends HttpServlet {
     private OrderService orderService;
 
     public static final Predicate<String> PHONE_VALIDATOR = value ->
-            value.matches("\\d{10,15}");
+            value.matches("^\\+?\\d{10,15}$");
 
     public static final Predicate<String> NAME_VALIDATOR = value ->
             value.matches("^[a-zA-Zа-яА-ЯёЁ\\s-]+$");
+
+    public static final Predicate<String> ADDRESS_VALIDATOR = value ->
+            value.matches("^[a-zA-Zа-яА-ЯёЁ0-9\\s,/-]+$");
 
     public static final Predicate<String> DATE_VALIDATOR = value ->
             value.matches("\\d{4}-\\d{2}-\\d{2}"); // Формат YYYY-MM-DD
@@ -58,13 +62,14 @@ public class CheckoutPageServlet extends HttpServlet {
         Map<String, String> errors = new HashMap<>();
         setRequiredParameter(request, "firstName", errors, order::setFirstName, NAME_VALIDATOR);
         setRequiredParameter(request, "lastName", errors, order::setLastName, NAME_VALIDATOR);
-        setRequiredParameter(request, "deliveryAddress", errors, order::setDeliveryAddress, NAME_VALIDATOR);
+        setRequiredParameter(request, "deliveryAddress", errors, order::setDeliveryAddress, ADDRESS_VALIDATOR);
         setRequiredParameter(request, "phone", errors, order::setPhone, PHONE_VALIDATOR);
         setPaymentMethod(request, errors, order);
         setDeliveryDate(request, errors, order);
 
         if (errors.isEmpty()) {
             orderService.placeOrder(order);
+            cartService.clear(cartService.getCart(request.getSession()));
             response.sendRedirect(request.getContextPath() + "/order/overview/" + order.getSecureId());
         } else {
             request.setAttribute("errors", errors);
@@ -79,9 +84,9 @@ public class CheckoutPageServlet extends HttpServlet {
                                             Consumer<String> consumer, Predicate<String> validationPredicate) {
         String value = request.getParameter(parameter);
         if (value == null || value.isEmpty()) {
-            errors.put(parameter, "This field is required");
+            errors.put(parameter, "This field is required.");
         } else if (!validationPredicate.test(value)) {
-            errors.put(parameter, "This field is required");
+            errors.put(parameter, "Check the field correctly.");
         } else {
             consumer.accept(value);
         }
@@ -91,7 +96,7 @@ public class CheckoutPageServlet extends HttpServlet {
         String parameter = "paymentMethod";
         String value = request.getParameter(parameter);
         if (value == null || value.isEmpty()) {
-            errors.put(parameter, "This field is required");
+            errors.put(parameter, "This field is required.");
         } else {
             order.setPaymentMethod(PaymentMethod.valueOf(value));
         }
@@ -101,8 +106,12 @@ public class CheckoutPageServlet extends HttpServlet {
         String parameter = "deliveryDate";
         String value = request.getParameter(parameter);
         if (value == null || value.isEmpty()) {
-            errors.put(parameter, "This field is required");
+            errors.put(parameter, "This field is required.");
         } else {
+            Date date = Date.valueOf(value);
+            if (date.before(Date.valueOf(LocalDate.now()))) {
+                errors.put(parameter, "Check your date correctly.");
+            }
             order.setDeliveryDate(Date.valueOf(value));
         }
     }

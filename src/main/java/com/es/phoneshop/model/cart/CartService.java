@@ -10,4 +10,6 @@ public interface CartService {
     public void update(Cart cart, long productId, int quantity);
 
     public void delete(Cart cart, long productId);
+
+    public void clear(Cart cart);
 }

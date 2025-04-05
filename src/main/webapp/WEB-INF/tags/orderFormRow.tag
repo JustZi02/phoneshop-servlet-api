@@ -8,6 +8,7 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
 
+<tr>
 <td>${label}<span style="color:red">*</span></td>
 <td>
     <c:set var="error" value="${errors[name]}"/>
@@ -18,3 +19,4 @@
         </div>
     </c:if>
 </td>
+</tr>

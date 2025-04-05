@@ -22,7 +22,7 @@
 </main>
 <footer>
     <p>
-        (c) Expert-Soft
+        (c) Expert-Soft 2025
     </p>
 </footer>
 </body>

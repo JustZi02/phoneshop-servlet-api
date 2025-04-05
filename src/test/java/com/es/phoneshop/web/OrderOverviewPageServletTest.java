@@ -12,9 +12,8 @@ import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 
-import java.util.NoSuchElementException;
-
-import static org.mockito.ArgumentMatchers.*;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -28,8 +27,6 @@ public class OrderOverviewPageServletTest {
     private RequestDispatcher requestDispatcher;
     @Mock
     private ServletConfig config;
-    @Mock
-    private HttpSession session;
 
     private OrderOverviewPageServlet servlet = new OrderOverviewPageServlet();
 
@@ -37,14 +34,13 @@ public class OrderOverviewPageServletTest {
     public void setup() throws ServletException {
         servlet.init(config);
         when(request.getRequestDispatcher(anyString())).thenReturn(requestDispatcher);
-        when(request.getSession()).thenReturn(session);
     }
 
-    @Test(expected = NoSuchElementException.class)
+    @Test
     public void testDoGet() throws Exception {
         when(request.getPathInfo()).thenReturn("/1");
         servlet.doGet(request, response);
         verify(requestDispatcher).forward(request, response);
-        verify(request).setAttribute(eq("order"), anyObject());
+        verify(request).setAttribute(eq("errorMessage"), anyString());
     }
 }

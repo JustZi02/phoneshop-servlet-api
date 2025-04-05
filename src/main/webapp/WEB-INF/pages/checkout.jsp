@@ -69,33 +69,25 @@
     <h1>Your data:</h1>
     <form method="post" action="${pageContext.servletContext.contextPath}/checkout">
         <table>
-            <tr>
-                <tags:orderFormRow label="First name" name="firstName" order="${order}"
-                                   errors="${errors}"></tags:orderFormRow>
-            </tr>
-            <tr>
-                <tags:orderFormRow label="Last name" name="lastName" order="${order}"
-                                   errors="${errors}"></tags:orderFormRow>
-            </tr>
-            <tr>
+                <tags:orderFormRow label="First name" name="firstName" order="${order}" errors="${errors}"></tags:orderFormRow>
+                <tags:orderFormRow label="Last name" name="lastName" order="${order}" errors="${errors}"></tags:orderFormRow>
                 <tags:orderFormRow label="Phone" name="phone" order="${order}" errors="${errors}"></tags:orderFormRow>
-
-            </tr>
             <tr>
-                <td>Delivery date:</td>
+                <td>Delivery date:<span style="color:red">*</span></td>
                 <td>
                     <c:set var="error" value="${errors['deliveryDate']}"/>
                     <input type="date" name="deliveryDate"
                            value="${not empty error ? param['deliveryDate'] : order.deliveryDate}"/>
+                    <c:if test="${not empty error}">
+                        <div class="error">
+                                ${error}
+                        </div>
+                    </c:if>
                 </td>
             </tr>
+                <tags:orderFormRow label="Delivery address" name="deliveryAddress" order="${order}" errors="${errors}"></tags:orderFormRow>
             <tr>
-                <tags:orderFormRow label="Delivery address" name="deliveryAddress" order="${order}"
-                                   errors="${errors}"></tags:orderFormRow>
-
-            </tr>
-            <tr>
-                <td>Payment method:</td>
+                <td>Payment method:<span style="color:red">*</span></td>
                 <td>
                     <c:set var="error" value="${errors['paymentMethod']}"/>
                     <select name="paymentMethod">
@@ -108,6 +100,11 @@
                             >${paymentMethod}</option>
                         </c:forEach>
                     </select>
+                    <c:if test="${not empty error}">
+                    <div class="error">
+                            ${error}
+                    </div>
+                    </c:if>
                 </td>
             </tr>
 

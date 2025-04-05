@@ -1,23 +1,12 @@
 package com.es.phoneshop.model.order;
 
-
+import com.es.phoneshop.model.AbstractDao;
 import com.es.phoneshop.model.exceptions.OrderNotFoundException;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.concurrent.locks.ReadWriteLock;
-import java.util.concurrent.locks.ReentrantReadWriteLock;
-
-public class ArrayListOrderDao implements OrderDao {
+public class ArrayListOrderDao extends AbstractDao<Order> implements OrderDao {
     private static OrderDao instance;
 
-    private final ReadWriteLock lock = new ReentrantReadWriteLock();
-    private List<Order> orders;
-    private long maxId;
-
     private ArrayListOrderDao() {
-        orders = new ArrayList<Order>();
-        maxId = 0l;
     }
 
     public static synchronized OrderDao getInstance() {
@@ -28,43 +17,33 @@ public class ArrayListOrderDao implements OrderDao {
     }
 
     @Override
+    protected Long getId(Order item) {
+        return item.getId();
+    }
+
+    @Override
+    protected void setId(Order item, Long id) {
+        item.setId(id);
+    }
+
+    @Override
     public Order getOrder(Long id) {
-        lock.readLock().lock();
-        try {
-            return orders.stream()
-                    .filter(order -> id.equals(order.getId()))
-                    .findAny()
-                    .orElseThrow(() -> new OrderNotFoundException("Order with id " + id + " was not found."));
-        } finally {
-            lock.readLock().unlock();
-        }
+        return super.get(id);
     }
 
     @Override
-    public void save(Order order) throws NullPointerException {
-        lock.writeLock().lock();
-        try {
-            Long id = order.getId();
-            if (id != null) {
-                orders.remove(getOrder(id));
-                orders.add(order);
-            } else {
-                order.setId(maxId++);
-                orders.add(order);
-            }
-        } finally {
-            lock.writeLock().unlock();
-        }
+    public void save(Order order) {
+        super.save(order);
     }
 
     @Override
-    public Order getOrderSecureId(String secureId) throws OrderNotFoundException {
+    public Order getOrderSecureId(String secureId) {
         lock.readLock().lock();
         try {
-            return orders.stream()
+            return items.stream()
                     .filter(order -> secureId.equals(order.getSecureId()))
                     .findAny()
-                    .orElseThrow(() -> new OrderNotFoundException("Order with id " + secureId + " was not found."));
+                    .orElseThrow(() -> new OrderNotFoundException("Order with secureId " + secureId + " was not found."));
         } finally {
             lock.readLock().unlock();
         }

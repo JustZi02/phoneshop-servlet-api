@@ -1,9 +1,9 @@
 package com.es.phoneshop.web;
 
-import com.es.phoneshop.model.constants.StoreConstants;
 import com.es.phoneshop.model.cart.Cart;
 import com.es.phoneshop.model.cart.CartService;
 import com.es.phoneshop.model.cart.DefaultCartService;
+import com.es.phoneshop.model.constants.StoreConstants;
 import com.es.phoneshop.model.exceptions.OutOfStockException;
 import com.es.phoneshop.model.history.DefaultSearchHistoryService;
 import com.es.phoneshop.model.history.SearchHistoryService;

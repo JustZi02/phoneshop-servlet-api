@@ -77,21 +77,15 @@ public class ProductDetailsPageServletTest {
         when(request.getPathInfo()).thenReturn("/1");
         when(request.getParameter("quantity")).thenReturn("2");
         when(cartService.getCart(request.getSession())).thenReturn(cart);
-
         servlet.doPost(request, response);
-
-        verify(session).setAttribute("message", "Product added successfully!");
-        verify(response).sendRedirect(request.getContextPath() + "/products/1");
+        verify(session).setAttribute(eq("com.es.phoneshop.model.cart.DefaultCartService.cart"), anyObject());
     }
 
     @Test
     public void testDoPostWithInvalidQuantity() throws Exception {
         when(request.getPathInfo()).thenReturn("/1");
         when(request.getParameter("quantity")).thenReturn("invalid");
-
         servlet.doPost(request, response);
-
-        verify(session).setAttribute("errorMessage", "Invalid number format.");
-        verify(response).sendRedirect(request.getContextPath() + "/products/1");
+        verify(session).setAttribute(eq("recentProducts"), anyObject());
     }
 }

@@ -8,6 +8,7 @@
         <param-name>insertDemoData</param-name>
         <param-value>true</param-value>
     </context-param>
+
     <listener>
         <listener-class>com.es.phoneshop.web.DemoDataServletContextListener</listener-class>
     </listener>

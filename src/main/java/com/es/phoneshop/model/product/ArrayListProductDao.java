@@ -1,24 +1,17 @@
 package com.es.phoneshop.model.product;
 
-
+import com.es.phoneshop.model.AbstractDao;
 import com.es.phoneshop.model.sorting.SortField;
 import com.es.phoneshop.model.sorting.SortOrder;
 
 import java.util.*;
-import java.util.concurrent.locks.ReadWriteLock;
-import java.util.concurrent.locks.ReentrantReadWriteLock;
 import java.util.stream.Collectors;
 
-public class ArrayListProductDao implements ProductDao {
+public class ArrayListProductDao extends AbstractDao<Product> implements ProductDao {
     private static ProductDao instance;
 
-    private final ReadWriteLock lock = new ReentrantReadWriteLock();
-    private List<Product> products;
-    private long maxId;
-
     private ArrayListProductDao() {
-        products = new ArrayList<Product>();
-        maxId = 0l;
+        super();
     }
 
     public static synchronized ProductDao getInstance() {
@@ -29,10 +22,20 @@ public class ArrayListProductDao implements ProductDao {
     }
 
     @Override
+    protected Long getId(Product product) {
+        return product.getId();
+    }
+
+    @Override
+    protected void setId(Product product, Long id) {
+        product.setId(id);
+    }
+
+    @Override
     public Product getProduct(Long id) {
         lock.readLock().lock();
         try {
-            return products.stream()
+            return items.stream()
                     .filter(product -> id.equals(product.getId()))
                     .filter(this::NotNullPriceProducts)
                     .filter(this::NotOutOfStockProducts)
@@ -45,19 +48,17 @@ public class ArrayListProductDao implements ProductDao {
 
     @Override
     public List<Product> findProducts(String query, SortField sortField, SortOrder sortOrder) {
-
         lock.readLock().lock();
         try {
-            return products.stream()
+            return items.stream()
                     .filter(product -> MatchQueryProducts(product, query))
                     .filter(this::NotNullPriceProducts)
                     .filter(this::NotOutOfStockProducts)
-                    .sorted(Comparator.comparingLong((Product product) -> calculateWordMatch(product.getDescription(), query))
-                            .thenComparingDouble((Product product) -> calculateRelevance(product.getDescription(), query))
+                    .sorted(Comparator.comparingLong((Product p) -> calculateWordMatch(p.getDescription(), query))
+                            .thenComparingDouble(p -> calculateRelevance(p.getDescription(), query))
                             .reversed()
                             .thenComparing((p1, p2) -> sortByFieldAndOrder(p1, p2, sortField, sortOrder)))
                     .collect(Collectors.toList());
-
         } finally {
             lock.readLock().unlock();
         }
@@ -81,47 +82,35 @@ public class ArrayListProductDao implements ProductDao {
     }
 
     private long calculateWordMatch(String description, String query) {
-        if (query == null || description == null) {
-            return 0;
-        }
-        String descLower = description.toLowerCase();
-        String queryLower = query.toLowerCase();
+        if (query == null || description == null) return 0;
 
-        String[] queryWords = queryLower.split("\\s+");
-        String[] descWords = descLower.split("\\s+");
+        String[] queryWords = query.toLowerCase().split("\\s+");
+        String[] descWords = description.toLowerCase().split("\\s+");
 
-        long exactWordMatches = Arrays.stream(queryWords)
+        return Arrays.stream(queryWords)
                 .filter(word -> Arrays.asList(descWords).contains(word))
                 .count();
-        return exactWordMatches;
     }
 
     private double calculateRelevance(String description, String query) {
-        if (query == null || description == null) {
-            return 0.0;
-        }
-        String descLower = description.toLowerCase();
-        String queryLower = query.toLowerCase();
+        if (query == null || description == null) return 0.0;
 
-        String[] queryWords = queryLower.split("\\s+");
-        String[] descWords = descLower.split("\\s+");
+        String[] queryWords = query.toLowerCase().split("\\s+");
+        String[] descWords = description.toLowerCase().split("\\s+");
 
-        long exactWordMatches = Arrays.stream(queryWords)
+        long matchCount = Arrays.stream(queryWords)
                 .filter(word -> Arrays.asList(descWords).contains(word))
                 .count();
 
-        double relevance = (double) exactWordMatches / queryWords.length;
-        return relevance;
+        return (double) matchCount / queryWords.length;
     }
 
-
     private boolean MatchQueryProducts(Product product, String query) {
-        if (query == null) {
-            return true;
-        }
-        query = query.trim();
-        String[] queryParts = query.toLowerCase().split("\\s+");
-        return Arrays.stream(queryParts).anyMatch(product.getDescription().toLowerCase()::contains);
+        if (query == null) return true;
+
+        String[] queryParts = query.trim().toLowerCase().split("\\s+");
+        return Arrays.stream(queryParts)
+                .anyMatch(part -> product.getDescription().toLowerCase().contains(part));
     }
 
     private boolean NotNullPriceProducts(Product product) {
@@ -133,52 +122,49 @@ public class ArrayListProductDao implements ProductDao {
     }
 
     @Override
-    public void save(Product product) throws NullPointerException {
+    public void save(Product product) {
         lock.writeLock().lock();
         try {
             Objects.requireNonNull(product, "Product cannot be null");
-            products.stream().filter(p -> p.getCode().equals(product.getCode())).findFirst().ifPresentOrElse(p -> {
-                p.setDescription(product.getDescription());
-                updatePriceHistory(p, product);
-                p.setPrice(product.getPrice());
-                p.setCurrency(product.getCurrency());
-                p.setStock(product.getStock());
-                p.setImageUrl(product.getImageUrl());
-            }, () -> {
-                product.setId(maxId++);
-                products.add(product);
-            });
+            items.stream()
+                    .filter(p -> p.getCode().equals(product.getCode()))
+                    .findFirst()
+                    .ifPresentOrElse(p -> {
+                        p.setDescription(product.getDescription());
+                        updatePriceHistory(p, product);
+                        p.setPrice(product.getPrice());
+                        p.setCurrency(product.getCurrency());
+                        p.setStock(product.getStock());
+                        p.setImageUrl(product.getImageUrl());
+                    }, () -> {
+                        product.setId(maxId++);
+                        items.add(product);
+                    });
         } finally {
             lock.writeLock().unlock();
         }
     }
 
-    private void updatePriceHistory(Product p, Product product) {
-        List<PriceHistory> priceHistoryList = new ArrayList<>(p.getPriceHistory());
+    private void updatePriceHistory(Product p, Product newProduct) {
+        List<PriceHistory> history = new ArrayList<>(p.getPriceHistory());
 
-        for (PriceHistory newHistory : product.getPriceHistory()) {
-            boolean exists = priceHistoryList.stream()
-                    .anyMatch(history -> history.getPrice().compareTo(newHistory.getPrice()) == 0
-                            && history.getDate().compareTo(newHistory.getDate()) == 0);
+        for (PriceHistory newEntry : newProduct.getPriceHistory()) {
+            boolean exists = history.stream().anyMatch(
+                    h -> h.getPrice().compareTo(newEntry.getPrice()) == 0 &&
+                            h.getDate().compareTo(newEntry.getDate()) == 0
+            );
             if (!exists) {
-                priceHistoryList.add(newHistory);
+                history.add(newEntry);
             }
         }
-        priceHistoryList.sort(Comparator.comparing(PriceHistory::getDate));
-        p.setPriceHistory(priceHistoryList);
+
+        history.sort(Comparator.comparing(PriceHistory::getDate));
+        p.setPriceHistory(history);
     }
 
     @Override
-    public void delete(Long id) throws NoSuchElementException {
-        lock.writeLock().lock();
-        try {
-            boolean removed = products.removeIf(product -> id.equals(product.getId()));
-            if (!removed) {
-                throw new NoSuchElementException("Продукт с ID " + id + " не найден.");
-            }
-        } finally {
-            lock.writeLock().unlock();
-        }
+    public void delete(Long id) {
+        super.delete(id);
     }
 
     @Override
