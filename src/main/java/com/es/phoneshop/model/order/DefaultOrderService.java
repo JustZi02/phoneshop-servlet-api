@@ -64,7 +64,5 @@ public class DefaultOrderService implements OrderService {
     public void placeOrder(Order order) {
         order.setSecureId(UUID.randomUUID().toString());
         orderDao.save(order);
-        ProductDao productDao = ArrayListProductDao.getInstance();
-
     }
 }

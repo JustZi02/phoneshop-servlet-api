@@ -82,7 +82,9 @@ public class ArrayListProductDao extends AbstractDao<Product> implements Product
     }
 
     private long calculateWordMatch(String description, String query) {
-        if (query == null || description == null) return 0;
+        if (query == null || description == null) {
+            return 0;
+        }
 
         String[] queryWords = query.toLowerCase().split("\\s+");
         String[] descWords = description.toLowerCase().split("\\s+");
@@ -106,7 +108,9 @@ public class ArrayListProductDao extends AbstractDao<Product> implements Product
     }
 
     private boolean MatchQueryProducts(Product product, String query) {
-        if (query == null) return true;
+        if (query == null) {
+            return true;
+        }
 
         String[] queryParts = query.trim().toLowerCase().split("\\s+");
         return Arrays.stream(queryParts)

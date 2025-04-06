@@ -16,7 +16,7 @@ public class Order extends Cart {
     private String phone;
     private Date deliveryDate;
     private String deliveryAddress;
-    PaymentMethod paymentMethod;
+    private PaymentMethod paymentMethod;
 
     public String getSecureId() {
         return secureId;

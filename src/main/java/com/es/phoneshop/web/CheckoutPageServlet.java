@@ -36,7 +36,7 @@ public class CheckoutPageServlet extends HttpServlet {
             value.matches("^[a-zA-Zа-яА-ЯёЁ0-9\\s,/-]+$");
 
     public static final Predicate<String> DATE_VALIDATOR = value ->
-            value.matches("\\d{4}-\\d{2}-\\d{2}"); // Формат YYYY-MM-DD
+            value.matches("\\d{4}-\\d{2}-\\d{2}"); // YYYY-MM-DD
 
     @Override
     public void init(ServletConfig config) throws ServletException {

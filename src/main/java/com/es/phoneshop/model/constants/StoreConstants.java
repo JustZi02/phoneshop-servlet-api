@@ -13,6 +13,7 @@ public class StoreConstants {
         public final static String ERROR_PRODUCT_ID = "errorItem";
         public final static String PRODUCT_QUANTITY = "quantity";
         public final static String PRODUCT_ID = "productId";
+        public final static String ORDER = "order";
     }
 
     public static final class Pages {

@@ -32,7 +32,7 @@ public class OrderOverviewPageServlet extends HttpServlet {
             request.getRequestDispatcher(StoreConstants.Pages.ERROR_ORDER_NOT_FOUND).forward(request, response);
             return;
         }
-        request.setAttribute("order", order);
+        request.setAttribute(StoreConstants.Parameters.ORDER, order);
         request.getRequestDispatcher(StoreConstants.Pages.ORDER_OVERVIEW).forward(request, response);
     }
 }

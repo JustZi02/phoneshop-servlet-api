@@ -46,7 +46,7 @@ public abstract class AbstractDao<T> {
     public List<T> getAll() {
         lock.readLock().lock();
         try {
-            return new ArrayList<>(items);
+            return items;
         } finally {
             lock.readLock().unlock();
         }
