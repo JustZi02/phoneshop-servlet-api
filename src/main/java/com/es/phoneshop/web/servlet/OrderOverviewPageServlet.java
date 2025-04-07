@@ -1,4 +1,4 @@
-package com.es.phoneshop.web;
+package com.es.phoneshop.web.servlet;
 
 import com.es.phoneshop.model.constants.StoreConstants;
 import com.es.phoneshop.model.exceptions.OrderNotFoundException;

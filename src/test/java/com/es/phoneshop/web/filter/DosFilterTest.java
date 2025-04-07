@@ -1,4 +1,4 @@
-package com.es.phoneshop.web;
+package com.es.phoneshop.web.filter;
 
 import com.es.phoneshop.model.security.DefaultDosProtectionService;
 import com.es.phoneshop.model.security.DosProtectionService;
@@ -18,7 +18,7 @@ import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.*;
 
 @RunWith(MockitoJUnitRunner.class)
-public class DosFilterServletTest {
+public class DosFilterTest {
     @Mock
     private HttpServletRequest request;
     @Mock
@@ -29,6 +29,7 @@ public class DosFilterServletTest {
     private FilterConfig config;
 
     private DosFilter dosFilter;
+    private final String ip ="192.168.1.1";
 
     @Before
     public void setup() throws ServletException {
@@ -38,20 +39,20 @@ public class DosFilterServletTest {
 
     @Test
     public void testDoFilterAllowed() throws Exception {
-        when(request.getRemoteAddr()).thenReturn("192.168.1.1");
-        assertTrue(DefaultDosProtectionService.getInstance().isAllowed("192.168.1.1"));
+        when(request.getRemoteAddr()).thenReturn(ip);
+        assertTrue(DefaultDosProtectionService.getInstance().isAllowed(ip));
         dosFilter.doFilter(request, response, filterChain);
         verify(filterChain).doFilter(request, response);
     }
 
     @Test
     public void testDoFilterBlocked() throws Exception {
-        when(request.getRemoteAddr()).thenReturn("192.168.1.1");
+        when(request.getRemoteAddr()).thenReturn(ip);
         DosProtectionService dosProtectionService = DefaultDosProtectionService.getInstance();
         for (int i = 0; i < 20; i++) {
-            dosProtectionService.isAllowed("192.168.1.1");
+            dosProtectionService.isAllowed(ip);
         }
-        assertFalse(dosProtectionService.isAllowed("192.168.1.1"));
+        assertFalse(dosProtectionService.isAllowed(ip));
         dosFilter.doFilter(request, response, filterChain);
         verify(response).setStatus(429);
         verify(filterChain, never()).doFilter(request, response);

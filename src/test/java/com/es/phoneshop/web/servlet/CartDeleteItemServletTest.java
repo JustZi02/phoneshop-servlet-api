@@ -1,6 +1,5 @@
-package com.es.phoneshop.web;
+package com.es.phoneshop.web.servlet;
 
-import jakarta.servlet.RequestDispatcher;
 import jakarta.servlet.ServletConfig;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -17,34 +16,26 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @RunWith(MockitoJUnitRunner.class)
-public class CartPageServletTest {
+public class CartDeleteItemServletTest {
     @Mock
     private HttpServletRequest request;
     @Mock
     private HttpServletResponse response;
     @Mock
-    private RequestDispatcher requestDispatcher;
-    @Mock
     private ServletConfig config;
     @Mock
     private HttpSession session;
 
-    private CartPageServlet servlet = new CartPageServlet();
+    private CartDeleteItemServlet servlet = new CartDeleteItemServlet();
 
     @Before
     public void setup() throws ServletException {
         servlet.init(config);
-        when(request.getRequestDispatcher(anyString())).thenReturn(requestDispatcher);
         when(request.getSession()).thenReturn(session);
+        when(request.getPathInfo()).thenReturn("/1");
     }
 
     @Test
-    public void testDoGet() throws Exception {
-        servlet.doGet(request, response);
-        verify(requestDispatcher).forward(request, response);
-    }
-
-    @Test(expected = NullPointerException.class)
     public void testDoPost() throws Exception {
         servlet.doPost(request, response);
         verify(response).sendRedirect(anyString());

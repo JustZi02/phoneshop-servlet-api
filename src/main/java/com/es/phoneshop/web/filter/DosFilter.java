@@ -1,4 +1,4 @@
-package com.es.phoneshop.web;
+package com.es.phoneshop.web.filter;
 
 import com.es.phoneshop.model.security.DefaultDosProtectionService;
 import com.es.phoneshop.model.security.DosProtectionService;

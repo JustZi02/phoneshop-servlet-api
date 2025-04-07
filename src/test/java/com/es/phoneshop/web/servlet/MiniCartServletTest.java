@@ -1,4 +1,4 @@
-package com.es.phoneshop.web;
+package com.es.phoneshop.web.servlet;
 
 import jakarta.servlet.RequestDispatcher;
 import jakarta.servlet.ServletConfig;
@@ -17,7 +17,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @RunWith(MockitoJUnitRunner.class)
-public class CheckoutPageServletTest {
+public class MiniCartServletTest {
     @Mock
     private HttpServletRequest request;
     @Mock
@@ -29,7 +29,7 @@ public class CheckoutPageServletTest {
     @Mock
     private HttpSession session;
 
-    private CheckoutPageServlet servlet = new CheckoutPageServlet();
+    private MiniCartServlet servlet = new MiniCartServlet();
 
     @Before
     public void setup() throws ServletException {
@@ -41,13 +41,7 @@ public class CheckoutPageServletTest {
     @Test
     public void testDoGet() throws Exception {
         servlet.doGet(request, response);
-        verify(requestDispatcher).forward(request, response);
-    }
-
-    @Test
-    public void testDoPost() throws Exception {
-        servlet.doPost(request, response);
-        verify(request).setAttribute(eq("errors"), anyObject());
-        verify(request).setAttribute(eq("paymentMethods"), anyObject());
+        verify(requestDispatcher).include(request, response);
+        verify(request).setAttribute(eq("cart"), any());
     }
 }

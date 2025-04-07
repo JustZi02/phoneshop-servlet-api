@@ -1,4 +1,4 @@
-package com.es.phoneshop.web;
+package com.es.phoneshop.web.servlet;
 
 import com.es.phoneshop.model.cart.Cart;
 import com.es.phoneshop.model.cart.CartService;
@@ -41,19 +41,19 @@ public class ProductDetailsPageServlet extends HttpServlet {
         try {
             Product product = productDao.getProduct(parseProductId(request));
             searchHistoryService.update(product, request);
-            request.setAttribute("product", product);
+            request.setAttribute(StoreConstants.Parameters.PRODUCT, product);
         } catch (NoSuchElementException e) {
             request.setAttribute(StoreConstants.Parameters.ERROR_MESSAGE, e.getMessage());
             request.getRequestDispatcher(StoreConstants.Pages.ERROR_NO_SUCH_ELEMENT_EXCEPTION).forward(request, response);
         }
-        request.setAttribute("cart", cartService.getCart(session).toString());
+        request.setAttribute(StoreConstants.Parameters.CART, cartService.getCart(session).toString());
         request.getRequestDispatcher(StoreConstants.Pages.PRODUCT_DETAILS).forward(request, response);
-        session.setAttribute("message", "");
+        session.setAttribute(StoreConstants.Parameters.SUCCESS_MESSAGE, "");
     }
 
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        String stringQuantity = request.getParameter("quantity").trim();
+        String stringQuantity = request.getParameter(StoreConstants.Parameters.PRODUCT_QUANTITY).trim();
         Long productId = parseProductId(request);
         int quantity;
         try {

@@ -1,4 +1,4 @@
-package com.es.phoneshop.web;
+package com.es.phoneshop.web.servlet;
 
 import com.es.phoneshop.model.cart.Cart;
 import com.es.phoneshop.model.cart.CartService;
@@ -43,13 +43,13 @@ public class ProductListPageServlet extends HttpServlet {
                         Optional.ofNullable(sortOrder).map(SortOrder::valueOf).orElse(null)
                 ));
         request.getRequestDispatcher(StoreConstants.Pages.PRODUCT_LIST).forward(request, response);
-        request.getSession().setAttribute("message", "");
+        request.getSession().setAttribute(StoreConstants.Parameters.SUCCESS_MESSAGE, "");
     }
 
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        String stringQuantity = request.getParameter("quantity").trim();
-        Long productId = Long.parseLong(request.getParameter("productId"));
+        String stringQuantity = request.getParameter(StoreConstants.Parameters.PRODUCT_QUANTITY).trim();
+        Long productId = Long.parseLong(request.getParameter(StoreConstants.Parameters.PRODUCT_ID).trim());
         int quantity;
         try {
             quantity = Validation.quantityStringToInt(stringQuantity, request.getLocale());

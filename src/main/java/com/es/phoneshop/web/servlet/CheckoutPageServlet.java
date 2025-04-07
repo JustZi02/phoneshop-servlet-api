@@ -1,4 +1,4 @@
-package com.es.phoneshop.web;
+package com.es.phoneshop.web.servlet;
 
 import com.es.phoneshop.model.cart.CartService;
 import com.es.phoneshop.model.cart.DefaultCartService;
@@ -13,6 +13,7 @@ import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
+import org.codehaus.plexus.util.StringUtils;
 
 import java.io.IOException;
 import java.sql.Date;
@@ -48,7 +49,7 @@ public class CheckoutPageServlet extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         Order order = orderService.getOrder(cartService.getCart(request.getSession()));
-        request.setAttribute("order", order);
+        request.setAttribute(StoreConstants.Parameters.ORDER, order);
         request.setAttribute("paymentMethods", orderService.getPaymentMethods());
         request.getRequestDispatcher(StoreConstants.Pages.CHECKOUT).forward(request, response);
 
@@ -58,7 +59,7 @@ public class CheckoutPageServlet extends HttpServlet {
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         HttpSession session = request.getSession();
         Order order = orderService.getOrder(cartService.getCart(session));
-        request.setAttribute("order", order);
+        request.setAttribute(StoreConstants.Parameters.ORDER, order);
         Map<String, String> errors = new HashMap<>();
         setRequiredParameter(request, "firstName", errors, order::setFirstName, NAME_VALIDATOR);
         setRequiredParameter(request, "lastName", errors, order::setLastName, NAME_VALIDATOR);
@@ -73,7 +74,7 @@ public class CheckoutPageServlet extends HttpServlet {
             response.sendRedirect(request.getContextPath() + "/order/overview/" + order.getSecureId());
         } else {
             request.setAttribute("errors", errors);
-            request.setAttribute("order", order);
+            request.setAttribute(StoreConstants.Parameters.ORDER, order);
             request.setAttribute("paymentMethods", orderService.getPaymentMethods());
             request.getRequestDispatcher(StoreConstants.Pages.CHECKOUT).forward(request, response);
         }
@@ -83,7 +84,7 @@ public class CheckoutPageServlet extends HttpServlet {
     public static void setRequiredParameter(HttpServletRequest request, String parameter, Map<String, String> errors,
                                             Consumer<String> consumer, Predicate<String> validationPredicate) {
         String value = request.getParameter(parameter);
-        if (value == null || value.isEmpty()) {
+        if (value == null || value.isEmpty() || StringUtils.isBlank(value)) {
             errors.put(parameter, "This field is required.");
         } else if (!validationPredicate.test(value)) {
             errors.put(parameter, "Check the field correctly.");

@@ -1,4 +1,4 @@
-package com.es.phoneshop.web;
+package com.es.phoneshop.web.servlet;
 
 import com.es.phoneshop.model.cart.Cart;
 import com.es.phoneshop.model.cart.CartService;
@@ -35,7 +35,7 @@ public class CartPageServlet extends HttpServlet {
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        request.setAttribute("cart", cartService.getCart(request.getSession()));
+        request.setAttribute(StoreConstants.Parameters.CART, cartService.getCart(request.getSession()));
         request.getRequestDispatcher(StoreConstants.Pages.CART).forward(request, response);
     }
 

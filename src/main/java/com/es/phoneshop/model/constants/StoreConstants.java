@@ -14,6 +14,8 @@ public class StoreConstants {
         public final static String PRODUCT_QUANTITY = "quantity";
         public final static String PRODUCT_ID = "productId";
         public final static String ORDER = "order";
+        public final static String CART = "cart";
+        public final static String PRODUCT = "product";
     }
 
     public static final class Pages {
