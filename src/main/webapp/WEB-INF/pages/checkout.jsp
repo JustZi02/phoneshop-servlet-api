@@ -69,23 +69,11 @@
     <h1>Your data:</h1>
     <form method="post" action="${pageContext.servletContext.contextPath}/checkout">
         <table>
-                <tags:orderFormRow label="First name" name="firstName" order="${order}" errors="${errors}"></tags:orderFormRow>
-                <tags:orderFormRow label="Last name" name="lastName" order="${order}" errors="${errors}"></tags:orderFormRow>
-                <tags:orderFormRow label="Phone" name="phone" order="${order}" errors="${errors}"></tags:orderFormRow>
-            <tr>
-                <td>Delivery date:<span style="color:red">*</span></td>
-                <td>
-                    <c:set var="error" value="${errors['deliveryDate']}"/>
-                    <input type="date" name="deliveryDate"
-                           value="${not empty error ? param['deliveryDate'] : order.deliveryDate}"/>
-                    <c:if test="${not empty error}">
-                        <div class="error">
-                                ${error}
-                        </div>
-                    </c:if>
-                </td>
-            </tr>
-                <tags:orderFormRow label="Delivery address" name="deliveryAddress" order="${order}" errors="${errors}"></tags:orderFormRow>
+                <tags:orderFormRow label="First name" name="firstName" type="text" order="${order}" errors="${errors}"></tags:orderFormRow>
+                <tags:orderFormRow label="Last name" name="lastName" type="text" order="${order}" errors="${errors}"></tags:orderFormRow>
+                <tags:orderFormRow label="Phone" name="phone" type="tel" order="${order}" errors="${errors}"></tags:orderFormRow>
+                <tags:orderFormRow label="Delivery date" name="deliveryDate" type="date" order="${order}" errors="${errors}"></tags:orderFormRow>
+                <tags:orderFormRow label="Delivery address" name="deliveryAddress" type="text" order="${order}" errors="${errors}"></tags:orderFormRow>
             <tr>
                 <td>Payment method:<span style="color:red">*</span></td>
                 <td>
@@ -107,11 +95,8 @@
                     </c:if>
                 </td>
             </tr>
-
         </table>
-
         <button type="submit">Place order</button>
     </form>
-
     <tags:searchHistory/>
 </tags:master>

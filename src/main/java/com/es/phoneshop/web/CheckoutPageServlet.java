@@ -27,7 +27,7 @@ public class CheckoutPageServlet extends HttpServlet {
     private OrderService orderService;
 
     public static final Predicate<String> PHONE_VALIDATOR = value ->
-            value.matches("^\\+?\\d{10,15}$");
+            value.matches("^\\+\\d{12}$");
 
     public static final Predicate<String> NAME_VALIDATOR = value ->
             value.matches("^[a-zA-Zа-яА-ЯёЁ\\s-]+$");
