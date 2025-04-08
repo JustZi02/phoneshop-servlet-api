@@ -2,12 +2,9 @@ package com.es.phoneshop.model.cart;
 
 import com.es.phoneshop.model.product.Product;
 
-import java.io.Serial;
 import java.io.Serializable;
 
-public class CartItem implements Serializable {
-    @Serial
-    private static final long serialVersionUID = 123722387956287383L;
+public class CartItem implements Serializable, Cloneable {
 
     Product product;
     int quantity;
@@ -32,5 +29,10 @@ public class CartItem implements Serializable {
     @Override
     public String toString() {
         return "" + product.getDescription() + " (" + quantity + ")";
+    }
+
+    @Override
+    public Object clone() throws CloneNotSupportedException {
+        return super.clone();
     }
 }

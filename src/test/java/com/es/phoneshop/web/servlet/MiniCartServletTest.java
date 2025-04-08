@@ -1,4 +1,4 @@
-package com.es.phoneshop.web;
+package com.es.phoneshop.web.servlet;
 
 import jakarta.servlet.RequestDispatcher;
 import jakarta.servlet.ServletConfig;
@@ -12,12 +12,12 @@ import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 
-import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @RunWith(MockitoJUnitRunner.class)
-public class CartPageServletTest {
+public class MiniCartServletTest {
     @Mock
     private HttpServletRequest request;
     @Mock
@@ -29,7 +29,7 @@ public class CartPageServletTest {
     @Mock
     private HttpSession session;
 
-    private CartPageServlet servlet = new CartPageServlet();
+    private MiniCartServlet servlet = new MiniCartServlet();
 
     @Before
     public void setup() throws ServletException {
@@ -41,12 +41,7 @@ public class CartPageServletTest {
     @Test
     public void testDoGet() throws Exception {
         servlet.doGet(request, response);
-        verify(requestDispatcher).forward(request, response);
-    }
-
-    @Test(expected = NullPointerException.class)
-    public void testDoPost() throws Exception {
-        servlet.doPost(request, response);
-        verify(response).sendRedirect(anyString());
+        verify(requestDispatcher).include(request, response);
+        verify(request).setAttribute(eq("cart"), any());
     }
 }
