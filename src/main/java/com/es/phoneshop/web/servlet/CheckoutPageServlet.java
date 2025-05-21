@@ -31,10 +31,10 @@ public class CheckoutPageServlet extends HttpServlet {
             value.matches("^\\+\\d{12}$");
 
     public static final Predicate<String> NAME_VALIDATOR = value ->
-            value.matches("^[a-zA-Zа-яА-ЯёЁ\\s-]+$");
+            value.matches("(?u)^[\\p{L}\\s-]+$");
 
     public static final Predicate<String> ADDRESS_VALIDATOR = value ->
-            value.matches("^[a-zA-Zа-яА-ЯёЁ0-9\\s,/-]+$");
+            value.matches("(?u)^[\\p{L}0-9\\s,/-]+$");
 
     public static final Predicate<String> DATE_VALIDATOR = value ->
             value.matches("\\d{4}-\\d{2}-\\d{2}"); // YYYY-MM-DD

@@ -27,5 +27,6 @@ public class StoreConstants {
         public final static String ERROR_NO_SUCH_ELEMENT_EXCEPTION = "/WEB-INF/pages/errorNoSuchElementException.jsp";
         public final static String ERROR_ORDER_NOT_FOUND = "/WEB-INF/pages/errorOrderNotFoundException.jsp";
         public final static String ORDER_OVERVIEW = "/WEB-INF/pages/orderOverview.jsp";
+        public final static String ADVANCED_SEARCH = "/WEB-INF/pages/advancedSearch.jsp";
     }
 }

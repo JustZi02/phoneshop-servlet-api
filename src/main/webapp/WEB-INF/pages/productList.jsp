@@ -25,6 +25,7 @@
         </div>
     </c:if>
     <br>
+    <a href="${pageContext.servletContext.contextPath}/advancedSearch">Use advanced search</a>
     <table>
         <thead>
         <tr>
