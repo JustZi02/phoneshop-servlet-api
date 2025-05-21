@@ -181,4 +181,10 @@ public class ArrayListProductDao extends AbstractDao<Product> implements Product
             lock.writeLock().unlock();
         }
     }
+
+    @Override
+    public List<Product> advancedSearchProducts()
+    {
+       return items.stream().collect(Collectors.toList());
+    }
 }
