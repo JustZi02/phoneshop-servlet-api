@@ -4,6 +4,7 @@ import com.es.phoneshop.model.AbstractDao;
 import com.es.phoneshop.model.sorting.SortField;
 import com.es.phoneshop.model.sorting.SortOrder;
 
+import java.math.BigDecimal;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -183,8 +184,17 @@ public class ArrayListProductDao extends AbstractDao<Product> implements Product
     }
 
     @Override
-    public List<Product> advancedSearchProducts()
+    public List<Product> advancedSearchProducts(String description, BigDecimal minPrice, BigDecimal maxPrice)
     {
-       return items.stream().collect(Collectors.toList());
+        if(description == null && minPrice == null && maxPrice == null) {
+            return items.stream().collect(Collectors.toList());
+        }
+        else {
+            return items.stream()
+                    .filter(product -> MatchQueryProducts(product, description))
+                    .filter(this::NotNullPriceProducts)
+                    .filter(this::NotOutOfStockProducts)
+                    .collect(Collectors.toList());
+        }
     }
 }

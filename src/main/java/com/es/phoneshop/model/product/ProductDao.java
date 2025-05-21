@@ -3,6 +3,7 @@ package com.es.phoneshop.model.product;
 import com.es.phoneshop.model.sorting.SortField;
 import com.es.phoneshop.model.sorting.SortOrder;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 public interface ProductDao {
@@ -16,5 +17,5 @@ public interface ProductDao {
 
     void updateQuantity(Long id, int quantity);
 
-    List<Product> advancedSearchProducts();
+    List<Product> advancedSearchProducts(String description, BigDecimal minPrice, BigDecimal maxPrice);
 }
