@@ -20,11 +20,19 @@
             <label>
                 <input name="description" value="${param.description}">
             </label>
-            <select name="searchType">
-                <option>All words</option>
-                <option>Any word</option>
-            </select>
-        </p>
+        <select name="searchType">
+            <c:forEach var="type" items="${searchTypes}">
+                <option value="${type}"
+                        <c:if test="${param['searchType'] == type}">
+                            selected
+                        </c:if>
+                >${type}</option>
+            </c:forEach>
+        </select>
+
+
+
+    </p>
         <p>
             Min Price:
             <label>

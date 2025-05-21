@@ -3,6 +3,8 @@ package com.es.phoneshop.web.servlet;
 import com.es.phoneshop.model.constants.StoreConstants;
 import com.es.phoneshop.model.product.ArrayListProductDao;
 import com.es.phoneshop.model.product.ProductDao;
+import com.es.phoneshop.model.sorting.SearchCriteria;
+import com.es.phoneshop.model.sorting.SortField;
 import jakarta.servlet.ServletConfig;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServlet;
@@ -11,6 +13,7 @@ import jakarta.servlet.http.HttpServletResponse;
 
 import java.io.IOException;
 import java.math.BigDecimal;
+import java.util.Optional;
 
 public class AdvancedSearchPageServlet extends HttpServlet {
     ProductDao productDao;
@@ -22,9 +25,12 @@ public class AdvancedSearchPageServlet extends HttpServlet {
     }
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        request.setAttribute("searchTypes", SearchCriteria.values());
+
         String description = request.getParameter("description");
         String minPriceParam = request.getParameter("minPrice");
         String maxPriceParam = request.getParameter("maxPrice");
+        String searchCriteria = request.getParameter("searchCriteria");
 
         boolean searchPerformed = request.getParameterMap().containsKey("description")
                 || request.getParameterMap().containsKey("minPrice")
@@ -48,7 +54,8 @@ public class AdvancedSearchPageServlet extends HttpServlet {
             hasError = true;
         }
         if (searchPerformed && !hasError) {
-            request.setAttribute("products", productDao.advancedSearchProducts(description, minPrice, maxPrice));
+            request.setAttribute("products", productDao.advancedSearchProducts(description, minPrice, maxPrice,
+                    Optional.ofNullable(searchCriteria).map(SearchCriteria::valueOf).orElse(null)));
         }
         request.setAttribute("searchPerformed", searchPerformed);
         request.getRequestDispatcher(StoreConstants.Pages.ADVANCED_SEARCH).forward(request, response);

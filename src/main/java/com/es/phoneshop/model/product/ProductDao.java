@@ -1,5 +1,6 @@
 package com.es.phoneshop.model.product;
 
+import com.es.phoneshop.model.sorting.SearchCriteria;
 import com.es.phoneshop.model.sorting.SortField;
 import com.es.phoneshop.model.sorting.SortOrder;
 
@@ -17,5 +18,5 @@ public interface ProductDao {
 
     void updateQuantity(Long id, int quantity);
 
-    List<Product> advancedSearchProducts(String description, BigDecimal minPrice, BigDecimal maxPrice);
+    List<Product> advancedSearchProducts(String description, BigDecimal minPrice, BigDecimal maxPrice, SearchCriteria searchCriteria);
 }

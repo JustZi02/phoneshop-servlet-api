@@ -1,6 +1,7 @@
 package com.es.phoneshop.model.product;
 
 import com.es.phoneshop.model.AbstractDao;
+import com.es.phoneshop.model.sorting.SearchCriteria;
 import com.es.phoneshop.model.sorting.SortField;
 import com.es.phoneshop.model.sorting.SortOrder;
 
@@ -52,7 +53,7 @@ public class ArrayListProductDao extends AbstractDao<Product> implements Product
         lock.readLock().lock();
         try {
             return items.stream()
-                    .filter(product -> MatchQueryProducts(product, query))
+                    .filter(product -> MatchQueryProducts(product, query, SearchCriteria.any_word))
                     .filter(this::NotNullPriceProducts)
                     .filter(this::NotOutOfStockProducts)
                     .sorted(Comparator.comparingLong((Product p) -> calculateWordMatch(p.getDescription(), query))
@@ -108,14 +109,20 @@ public class ArrayListProductDao extends AbstractDao<Product> implements Product
         return (double) matchCount / queryWords.length;
     }
 
-    private boolean MatchQueryProducts(Product product, String query) {
-        if (query == null) {
+    private boolean MatchQueryProducts(Product product, String query, SearchCriteria searchCriteria) {
+        if (query == null || query.isBlank()) {
             return true;
         }
-
         String[] queryParts = query.trim().toLowerCase().split("\\s+");
-        return Arrays.stream(queryParts)
-                .anyMatch(part -> product.getDescription().toLowerCase().contains(part));
+        String description = product.getDescription().toLowerCase();
+
+        if (SearchCriteria.any_word.equals(searchCriteria)) {
+            return Arrays.stream(queryParts)
+                    .anyMatch(description::contains);
+        } else {
+            return Arrays.stream(queryParts)
+                    .allMatch(description::contains);
+        }
     }
 
     private boolean NotNullPriceProducts(Product product) {
@@ -184,17 +191,30 @@ public class ArrayListProductDao extends AbstractDao<Product> implements Product
     }
 
     @Override
-    public List<Product> advancedSearchProducts(String description, BigDecimal minPrice, BigDecimal maxPrice)
-    {
-        if(description == null && minPrice == null && maxPrice == null) {
+    public List<Product> advancedSearchProducts(String query, BigDecimal minPrice, BigDecimal maxPrice, SearchCriteria searchCriteria) {
+        if (query == null && minPrice == null && maxPrice == null) {
             return items.stream().collect(Collectors.toList());
-        }
-        else {
+        } else {
             return items.stream()
-                    .filter(product -> MatchQueryProducts(product, description))
+                    .filter(product -> MatchQueryProducts(product, query, searchCriteria))
                     .filter(this::NotNullPriceProducts)
                     .filter(this::NotOutOfStockProducts)
+                    .filter(product -> isWithinPriceRange(product, minPrice, maxPrice))
                     .collect(Collectors.toList());
         }
     }
+
+    private boolean isWithinPriceRange(Product product, BigDecimal minPrice, BigDecimal maxPrice) {
+        if (product.getPrice() == null) {
+            return false;
+        }
+        if (minPrice != null && product.getPrice().compareTo(minPrice) < 0) {
+            return false;
+        }
+        if (maxPrice != null && product.getPrice().compareTo(maxPrice) > 0) {
+            return false;
+        }
+        return true;
+    }
+
 }
